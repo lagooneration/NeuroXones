@@ -26,7 +26,7 @@ const Heroh = () => {
           <div className="flex flex-col gap-7">
             <div className="hero-text">
               <h1>
-              .
+              NeuroXones <br />
                 <span className="slide">
                   <span className="wrapper">
                     {words.map((word, index) => (
@@ -45,7 +45,7 @@ const Heroh = () => {
                   </span>
                 </span>
               </h1>
-              <h1>Neuro-Steered</h1>
+              <h1>.</h1>
               <h1></h1>
             </div>
 

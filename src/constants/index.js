@@ -194,14 +194,14 @@ export const navLinks = [
 ];
 
 export const words = [
-  { text: "Ideas", imgPath: "/images/ideas.svg" },
-  { text: "Concepts", imgPath: "/images/concepts.svg" },
-  { text: "Designs", imgPath: "/images/designs.svg" },
-  { text: "Code", imgPath: "/images/code.svg" },
-  { text: "Ideas", imgPath: "/images/ideas.svg" },
-  { text: "Concepts", imgPath: "/images/concepts.svg" },
-  { text: "Designs", imgPath: "/images/designs.svg" },
-  { text: "Code", imgPath: "/images/code.svg" },
+  { text: "Neuro-Steered", imgPath: "/images/ideas.svg" },
+  { text: "Integrated EEG", imgPath: "/images/concepts.svg" },
+  { text: "Attention-Based", imgPath: "/images/designs.svg" },
+  { text: "AI/ML", imgPath: "/images/code.svg" },
+  { text: "Neuro-Steered", imgPath: "/images/ideas.svg" },
+  { text: "Integrated EEG", imgPath: "/images/concepts.svg" },
+  { text: "Attention-Based", imgPath: "/images/designs.svg" },
+  { text: "AI/ML", imgPath: "/images/code.svg" },
 ];
 
 export const counterItems = [

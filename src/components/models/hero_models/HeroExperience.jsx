@@ -1,12 +1,16 @@
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useMediaQuery } from "react-responsive";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
 
 import { Room } from "./Room";
 import HeroLights from "./HeroLights";
 import Particles from "./Particles";
 import { Suspense } from "react";
 import { Headphones } from "../../Headphones";
+import { Neuroxones } from "../../Neuroxones";
+import BackgroundShader from "../../BackgroundShader";
+
 
 const HeroExperience = () => {
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
@@ -19,7 +23,7 @@ const HeroExperience = () => {
       {/* Configure OrbitControls to disable panning and control zoom based on device type */}
       <OrbitControls
         enablePan={false} // Prevents panning of the scene
-        enableZoom={false} // Disables zoom on tablets
+        enableZoom={false}
         maxDistance={20} // Maximum distance for zooming out
         minDistance={5} // Minimum distance for zooming in
         minPolarAngle={Math.PI / 5} // Minimum angle for vertical rotation
@@ -27,17 +31,22 @@ const HeroExperience = () => {
       />
 
       <Suspense fallback={null}>
+
         <HeroLights />
-        <Particles count={100} />
+        {/* <Particles count={100} /> */}
+        <BackgroundShader />
         <group
-          scale={isMobile ? 0.7 : 1}
-          position={[2, 4.5, 0]}
-          rotation={[-Math.PI / 6, -Math.PI / 6, 0]}
+          scale={isMobile ? 26 : 26}
+          position={[0, -2.5, 0]} // Changed position to center
+          rotation={[-Math.PI / 6, Math.PI / 2, 0]}
         >
           {/* <Room /> */}
-          <Headphones />
+          <Neuroxones />
         </group>
       </Suspense>
+      <EffectComposer>
+        <Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
+      </EffectComposer>
     </Canvas>
   );
 };
