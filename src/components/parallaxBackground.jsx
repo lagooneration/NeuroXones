@@ -15,7 +15,7 @@ const ParallaxBackground = () => {
         <div
           className="absolute inset-0 w-full h-screen -z-50"
           style={{
-            backgroundImage: "url(/assets/sky.jpg)",
+            backgroundImage: "url(/assets/tech.jpg)",
             backgroundPosition: "bottom",
             backgroundSize: "cover",
           }}
@@ -54,7 +54,7 @@ const ParallaxBackground = () => {
         <motion.div
           className="absolute inset-0 -z-10"
           style={{
-            backgroundImage: "url(/assets/mountain-1.png)",
+            backgroundImage: "url(/assets/ff.png)",
             backgroundPosition: "bottom",
             backgroundSize: "cover",
             y: mountain1Y,

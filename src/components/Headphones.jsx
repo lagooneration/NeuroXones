@@ -32,7 +32,8 @@ export function Headphones(props) {
       ref={group}
       {...props} 
       dispose={null}
-      position={props.position || [0, -1, 0]}
+      position={props.position || [-5, 0, -5]}
+      scale={props.scale || 30.0}
     >
       <group rotation={[-Math.PI / 2, 0, 0]} scale={0.001}>
         <group rotation={[Math.PI / 2, 0, 0]}>
