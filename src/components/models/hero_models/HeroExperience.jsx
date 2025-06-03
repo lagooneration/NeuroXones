@@ -7,9 +7,8 @@ import { Room } from "./Room";
 import HeroLights from "./HeroLights";
 import Particles from "./Particles";
 import { Suspense } from "react";
-import { Neuroxone } from "../../models/Neuroxone";
-import { Brain } from "../../models/Brain";
-import BackgroundShader from "../../BackgroundShader";
+import { Neuroxones } from "../../Neuroxones";
+import { Brainy } from "../../models/Brainy";
 
 
 const HeroExperience = () => {
@@ -36,17 +35,18 @@ const HeroExperience = () => {
         {/* <Particles count={100} /> */}
         {/* <BackgroundShader /> */}
         <group
-          scale={isMobile ? 26 : 26}
+          scale={isMobile ? 20 : 24}
           position={[0, -2.5, 0]} // Changed position to center
           rotation={[-Math.PI / 6, Math.PI / 2, 0]}
         >
           {/* <Room /> */}
-          <Brain />
-          <Neuroxone />
+          {/* <Brainelectric /> */}
+          <Brainy />
+          <Neuroxones />
         </group>
       </Suspense>
       {/* <EffectComposer>
-        <Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={300} />
+        <Bloom luminanceThreshold={0} luminanceSmoothing={0.9} height={900} />
       </EffectComposer> */}
     </Canvas>
   );

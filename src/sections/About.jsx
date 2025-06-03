@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import Card from "../components/Card";
 import { Braint } from "../components/Braint";
-import CopyEmailButton from "../components/CopyEmailButton";
+// import CopyEmailButton from "../components/CopyEmailButton";
 import { Frameworks } from "../components/FrameWorks";
 import { Canvas } from "@react-three/fiber";
 import SimButton from "../components/SimButton";
