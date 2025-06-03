@@ -9,8 +9,8 @@ export function Neuroxone(props) {
   const { nodes, materials } = useGLTF('/models/neuroxone3.glb')
   return (
     <group {...props} dispose={null}>
-      <group position={[0.054, 0.124, 0.007]} rotation={[1.559, -0.837, 1.556]} scale={0.114}>
-        <group position={[-0.434, 0.094, -0.019]} rotation={[-0.269, 0.256, 3]}>
+      <group>
+        <group>
           <mesh
             castShadow
             receiveShadow
