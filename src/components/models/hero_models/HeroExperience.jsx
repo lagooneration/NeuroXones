@@ -37,7 +37,7 @@ const HeroExperience = () => {
         <group
           scale={isMobile ? 20 : 24}
           position={[0, -2.8, 0]} // Changed position to center
-          rotation={[-Math.PI / 6, Math.PI / 4, 0]}
+          rotation={[-Math.PI / 4, Math.PI / 4, 0]}
         >
           {/* <Room /> */}
           {/* <Brainelectric /> */}

@@ -1,13 +1,16 @@
 import { useRef } from "react";
 import Card from "../components/Card";
 import { Braint } from "../components/Braint";
+import { Lights } from "../components/Lights";
 // import CopyEmailButton from "../components/CopyEmailButton";
 import { Frameworks } from "../components/FrameWorks";
 import { Canvas } from "@react-three/fiber";
 import SimButton from "../components/SimButton";
+import { NeuralActivity } from "../components/NeuralActivity";
 
 const About = () => {
   const grid2Container = useRef();
+  const brainRef = useRef();
   return (
     <section className="c-space section-spacing" id="about">
       <h2 className="text-heading">Concept</h2>
@@ -19,9 +22,9 @@ const About = () => {
             className="absolute scale-[1.75] -right-[5rem] -top-[1rem] md:scale-[3] md:left-50 md:inset-y-10 lg:scale-[2.5]"
           />
           <div className="z-10">
-            <p className="headtext">Neuro-Steered Attention</p>
+            <p className="headtext">Choose to hear your sound of interest</p>
             <p className="subtext">
-              Auditory attention is a cognitive process that allows us to focus on specific sounds or information in our environment while filtering out distractions. It plays a crucial role in how we perceive and interact with the world around us.
+              Neuro-Steered headphones allow you to select and enhance specific sounds, such as speech, music, or environmental noise, based on their brain activity.
             </p>
           </div>
           <div className="absolute inset-x-0 pointer-evets-none -bottom-4 h-1/2 sm:h-1/3 bg-gradient-to-t from-indigo" />
@@ -34,7 +37,7 @@ const About = () => {
           >
             <img
             src="assets/ci.png"
-            className="absolute z-0 -top-[120px]"
+            className="absolute z-0 -top-[80px]"
             alt=""
           />
           <div className="z-10">
@@ -48,7 +51,7 @@ const About = () => {
           <div className="z-10 w-[50%]">
             <p className="headtext">Temporal Response Function</p>
             <p className="subtext">
-               (TRF) facilitates a mapping between features of sound & EEG responses. 
+               (TRF) facilitates a mapping b/w features of sound & EEG responses from the auditory cortex. 
             </p>
           </div>
           <figure className="absolute left-[25%] top-[5%] w-[70%] h-[70%]">
@@ -58,14 +61,23 @@ const About = () => {
               style={{ pointerEvents: "none" }}
               gl={{ antialias: true, alpha: true }}
               dpr={[1, 2]}
-            >
-              <ambientLight />
+            >              <ambientLight />
               <directionalLight
                 position={[10, 10, 5]}
                 intensity={1}
-                castShadow
               />
-              <Braint scale={0.045} position={[0.8, -1.3, 0]} />
+              <Braint 
+                // ref={brainRef} 
+                scale={0.045} 
+                position={[0.8, -1.3, 0]} 
+              />
+              <NeuralActivity
+                scale={1.25}
+                position={[0.8, -0.2, 0.16]}
+                rotation={[Math.PI/2, -Math.PI / 24, Math.PI/2]}
+                color="#4f9dff"
+              />
+              <Lights brainRotation={brainRef.current?.rotation.y || 0} />
             </Canvas>
           </figure>
         </div>
@@ -83,7 +95,7 @@ const About = () => {
           <div className="z-10 w-[50%]">
             <p className="headText">Industrial Applications</p>
             <p className="subtext">
-              Neuro-Steered headphones can be used in industries, including healthcare, education, and entertainment, to enhance auditory experiences.
+              Can be used in industries, like healthcare, education, military and entertainment, to enhance auditory experiences.
             </p>
           </div>
           <div className="absolute inset-y-0 md:inset-y-9 w-full h-full start-[50%] md:scale-125">

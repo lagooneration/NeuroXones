@@ -16,7 +16,7 @@ export const myProjects = [
     tags: [
       {
         id: 1,
-        name: "python",
+        name: "50 seconds",
         path: "/assets/logos/csharp.svg",
       },
       {
@@ -53,7 +53,7 @@ export const myProjects = [
     tags: [
       {
         id: 1,
-        name: "Convolutional",
+        name: "6 seconds",
         path: "/assets/logos/auth0.svg",
       },
       {
@@ -68,7 +68,7 @@ export const myProjects = [
       },
       {
         id: 4,
-        name: "Python",
+        name: "Convolutional",
         path: "/assets/logos/tailwindcss.svg",
       },
     ],
