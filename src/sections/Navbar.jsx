@@ -15,7 +15,7 @@ function Navigation() {
       </li>
       <li className="nav-li">
         <a className="nav-link" href="#work">
-          Work
+          Simulation
         </a>
       </li>
       <li className="nav-li">

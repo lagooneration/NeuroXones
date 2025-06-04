@@ -22,10 +22,10 @@ const About = () => {
             className="absolute scale-[1.75] -right-[5rem] -top-[1rem] md:scale-[3] md:left-50 md:inset-y-10 lg:scale-[2.5]"
           />
           <div className="z-10">
-            <p className="headtext">Choose to hear your sound of interest</p>
+            <p className="headtext">Move beyond passive listening</p>
             <p className="subtext">
-              Neuro-Steered headphones allow you to select and enhance specific sounds, such as speech, music, or environmental noise, based on their brain activity.
-            </p>
+              Actively identifying your attentional focus and dynamically enhancing the audio in real-time, precisely as per the user's conscious intent
+              </p>
           </div>
           <div className="absolute inset-x-0 pointer-evets-none -bottom-4 h-1/2 sm:h-1/3 bg-gradient-to-t from-indigo" />
         </div>
@@ -49,9 +49,9 @@ const About = () => {
         {/* Grid 3 */}
         <div className="grid-black-color grid-3">
           <div className="z-10 w-[50%]">
-            <p className="headtext">Temporal Response Function</p>
+            <p className="headtext">Temporal Response Fn</p>
             <p className="subtext">
-               (TRF) facilitates a mapping b/w features of sound & EEG responses from the auditory cortex. 
+               (TRF) facilitates a mapping b/w features of sound & EEG responses from the auditory cortex
             </p>
           </div>
           <figure className="absolute left-[25%] top-[5%] w-[70%] h-[70%]">
@@ -64,7 +64,7 @@ const About = () => {
             >              <ambientLight />
               <directionalLight
                 position={[10, 10, 5]}
-                intensity={1}
+                intensity={2}
               />
               <Braint 
                 // ref={brainRef} 
@@ -74,10 +74,10 @@ const About = () => {
               <NeuralActivity
                 scale={1.25}
                 position={[0.8, -0.2, 0.16]}
-                rotation={[Math.PI/2, -Math.PI / 24, Math.PI/2]}
+                rotation={[-Math.PI/2, -Math.PI / 24, 0]}
                 color="#4f9dff"
               />
-              <Lights brainRotation={brainRef.current?.rotation.y || 0} />
+              {/* <Lights brainRotation={brainRef.current?.rotation.y || 0} /> */}
             </Canvas>
           </figure>
         </div>

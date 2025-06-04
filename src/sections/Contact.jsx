@@ -51,7 +51,7 @@ const Contact = () => {
     }
   };
   return (
-    <section className="relative flex items-center c-space section-spacing">
+    <section id="contact" className="relative flex items-center c-space section-spacing">
       <Particles
         className="absolute inset-0 -z-50"
         quantity={100}
@@ -69,15 +69,15 @@ const Contact = () => {
         </div>
         <form className="w-full" onSubmit={handleSubmit}>
           <div className="mb-5">
-            <label htmlFor="name" className="feild-label">
+            {/* <label htmlFor="name" className="feild-label">
               Full Name
-            </label>
+            </label> */}
             <input
               id="name"
               name="name"
               type="text"
               className="field-input field-input-focus"
-              placeholder="John Doe"
+              placeholder="Full Name"
               autoComplete="name"
               value={formData.name}
               onChange={handleChange}
@@ -85,15 +85,15 @@ const Contact = () => {
             />
           </div>
           <div className="mb-5">
-            <label htmlFor="email" className="feild-label">
+            {/* <label htmlFor="email" className="feild-label">
               Email
-            </label>
+            </label> */}
             <input
               id="email"
               name="email"
               type="email"
               className="field-input field-input-focus"
-              placeholder="JohnDoe@email.com"
+              placeholder="Email"
               autoComplete="email"
               value={formData.email}
               onChange={handleChange}
@@ -101,9 +101,9 @@ const Contact = () => {
             />
           </div>
           <div className="mb-5">
-            <label htmlFor="message" className="feild-label">
+            {/* <label htmlFor="message" className="feild-label">
               Message
-            </label>
+            </label> */}
             <textarea
               id="message"
               name="message"
