@@ -1,12 +1,12 @@
 import { useRef } from "react";
-import Card from "../components/Card";
-import { Braint } from "../components/Braint";
-import { Lights } from "../components/Lights";
+ import { Braint } from "../components/Braint";
+// import { Lights } from "../components/Lights";
 // import CopyEmailButton from "../components/CopyEmailButton";
 import { Frameworks } from "../components/FrameWorks";
 import { Canvas } from "@react-three/fiber";
 import SimButton from "../components/SimButton";
 import { NeuralActivity } from "../components/NeuralActivity";
+import SpotlightCard from "../components/SpotlightCard";
 
 const About = () => {
   const grid2Container = useRef();
@@ -88,6 +88,8 @@ const About = () => {
               Experience Neuro-Steered listening?
             </p>
             <SimButton />
+          {/* <SpotlightCard className="h-fit w-fit" spotlightColor="rgba(0, 229, 255, 0.2)">
+          </SpotlightCard> */}
           </div>
         </div>
         {/* Grid 5 */}

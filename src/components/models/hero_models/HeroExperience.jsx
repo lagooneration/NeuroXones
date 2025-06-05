@@ -35,8 +35,8 @@ const HeroExperience = () => {
         {/* <Particles count={100} /> */}
         {/* <BackgroundShader /> */}
         <group
-          scale={isMobile ? 20 : 24}
-          position={[0, -2.8, 0]} // Changed position to center
+          scale={isMobile ? 20 : 20}
+          position={[0, -2.0, 0]} // Changed position to center
           rotation={[-Math.PI / 4, Math.PI / 4, 0]}
         >
           {/* <Room /> */}

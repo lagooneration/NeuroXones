@@ -1,55 +1,86 @@
-import { Canvas, useFrame } from "@react-three/fiber";
-import HeroText from "../components/HeroText";
-import ParallaxBackground from "../components/parallaxBackground";
-import { Float } from "@react-three/drei";
-import { useMediaQuery } from "react-responsive";
-import { easing } from "maath";
-import { Suspense } from "react";
-import Loader from "../components/Loader";
-import { Headphones } from "../components/Headphones";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import Aurora from "../components/Aurora";
+
+import Button from "../components/Button";
+import { words } from "../constants";
+import HeroExperience from "../components/models/hero_models/HeroExperience";
 
 const Hero = () => {
-  const isMobile = useMediaQuery({ maxWidth: 853 });
+  useGSAP(() => {
+    gsap.fromTo(
+      ".hero-text h1",
+      { y: 50, opacity: 0 },
+      { y: 0, opacity: 1, stagger: 0.2, duration: 1, ease: "power2.inOut" }
+    );
+  });
+
   return (
-    <section id="home" className="flex items-start justify-center min-h-screen overflow-hidden md:items-start md:justify-start c-space">
-      <HeroText />
-      <ParallaxBackground />
-      <figure
-        className="absolute inset-0"
-        style={{ width: "100vw", height: "100vh" }}
-      >
-        <Canvas camera={{ position: [0, 1, 2] }}>
-          <Suspense fallback={<Loader />}>
-            <Float>
-              <ambientLight intensity={0.5} />
-              <directionalLight
-                position={[10, 10, 5]}
-                intensity={1}
-                castShadow  
-              />
-              <Headphones
-                scale={isMobile ? 4.0 : 8.0}
-                position={isMobile ? [0, -1.5, 0] : [2, 0, -1]}
-                rotation={isMobile ? [-Math.PI / 6, Math.PI / 6, 0] : [-Math.PI/6, Math.PI / 4, 0]}
-              />
-            </Float>
-            <Rig />
-          </Suspense>
-        </Canvas>
-      </figure>
+    <section id="hero" className="relative overflow-hidden">
+      <div className="absolute top-0 left-0 z-10">
+        <img src="/images/bg.png" alt="" />
+      </div>
+      <div className="absolute w-full z-10">
+        <Aurora
+          colorStops={["#3A29FF", "#FF94B4", "#FF3232"]}
+          blend={0.5}
+          amplitude={2.0}
+          speed={0.5}
+        />
+      </div>
+
+      <div className="hero-layout">
+        {/* LEFT: Hero Content */}
+        <header className="flex flex-col justify-center md:w-full w-screen md:px-20 px-5">
+          <div className="flex flex-col gap-7">
+            <div className="hero-text">
+              <h1>
+              NeuroXones <br />
+                <span className="slide">
+                  <span className="wrapper">
+                    {words.map((word, index) => (
+                      <span
+                        key={index}
+                        className="flex items-center md:gap-3 gap-1 pb-2"
+                      >
+                        <img
+                          src={word.imgPath}
+                          alt="person"
+                          className="xl:size-12 md:size-10 size-7 md:p-2 p-1 rounded-full bg-white-50"
+                        />
+                        <span>{word.text}</span>
+                      </span>
+                    ))}
+                  </span>
+                </span>
+              </h1>
+              <h1>.</h1>
+              <h1></h1>
+            </div>
+
+            <p className="text-white-50 md:text-xl relative z-10 pointer-events-none">
+              Auditory Attention Detection Headphones
+            </p>
+
+            <Button
+              text="Get Started"
+              className="md:w-80 md:h-16 w-60 h-12"
+              id="counter"
+            />
+          </div>
+        </header>
+
+        {/* RIGHT: 3D Model or Visual */}
+        <figure>
+          <div className="hero-3d-layout">
+            <HeroExperience />
+          </div>
+        </figure>
+      </div>
+
+      {/* <AnimatedCounter /> */}
     </section>
   );
 };
-
-function Rig() {
-  return useFrame((state, delta) => {
-    easing.damp3(
-      state.camera.position,
-      [state.mouse.x / 10, 1 + state.mouse.y / 10, 3],
-      0.5,
-      delta
-    );
-  });
-}
 
 export default Hero;
