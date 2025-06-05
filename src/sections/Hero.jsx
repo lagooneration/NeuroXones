@@ -2,7 +2,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import Aurora from "../components/Aurora";
 
-import Button from "../components/Button";
+import HeroButton from "../components/HeroButton";
 import { words } from "../constants";
 import HeroExperience from "../components/models/hero_models/HeroExperience";
 
@@ -62,11 +62,12 @@ const Hero = () => {
               Auditory Attention Detection Headphones
             </p>
 
-            <Button
+            {/* <Button
               text="Get Started"
               className="md:w-80 md:h-16 w-60 h-12"
               id="counter"
-            />
+            /> */}
+            <HeroButton>Simulate</HeroButton>
           </div>
         </header>
 

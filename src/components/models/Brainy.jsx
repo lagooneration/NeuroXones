@@ -12,7 +12,7 @@ export function Brainy(props) {
   const { scene, nodes } = useGLTF('/models/brain.glb')
   
   // Load gradient texture for toon shading
-  const gradientMap = useTexture('/gradients/3.jpg')
+  const gradientMap = useTexture('/gradients/5.jpg')
   
   // Create materials
   const toonMaterial = useMemo(() => {
