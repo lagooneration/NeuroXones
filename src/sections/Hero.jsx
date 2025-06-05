@@ -31,7 +31,7 @@ const Hero = () => {
 
       <div className="hero-layout">
         {/* LEFT: Hero Content */}
-        <header className="flex flex-col justify-center md:w-full w-screen md:px-20 px-5">
+        <header className="flex flex-col justify-center md:w-full w-screen md:px-20 px-5 py-5">
           <div className="flex flex-col gap-7">
             <div className="hero-text">
               <h1>
@@ -67,7 +67,10 @@ const Hero = () => {
               className="md:w-80 md:h-16 w-60 h-12"
               id="counter"
             /> */}
-            <HeroButton>Simulate</HeroButton>
+            <HeroButton> 
+              <link href="/simulation" rel="preload" as="fetch" />  
+              Simulate
+              </HeroButton>
           </div>
         </header>
 

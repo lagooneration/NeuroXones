@@ -7,11 +7,58 @@ import { useGLTF, useTexture, Clone } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
+// Custom vertex shader for extrusion effect
+const vertexShader = `
+  uniform float time;
+  uniform vec3 mousePosition;
+  varying vec3 vPosition;
+  varying float vDistance;
+
+  void main() {
+    vPosition = position;
+    
+    // Calculate distance to mouse position in world space
+    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+    float dist = distance(worldPos.xyz, mousePosition);
+    vDistance = dist;    // Calculate extrusion amount based on distance
+    float maxDist = 0.5;
+    float extrudeAmount = smoothstep(maxDist, 0.0, dist) * 0.015;
+    
+    // Extrude along normal without wave effect
+    vec3 newPosition = position + normal * extrudeAmount;
+    
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+  }
+`
+
+const fragmentShader = `
+  uniform float time;
+  varying vec3 vPosition;
+  varying float vDistance;
+
+  void main() {
+    // Base color (transparent blue)
+    vec3 baseColor = vec3(0.25, 0.52, 0.95);
+    
+    // Highlight color (bright cyan)
+    vec3 highlightColor = vec3(0.0, 1.0, 1.0);    // Mix colors based on distance
+    float maxDist = 0.2;
+    float colorMix = smoothstep(maxDist, 0.0, vDistance);
+    
+    vec3 finalColor = mix(baseColor, highlightColor, colorMix);
+    
+    // Opacity transition (more transparent when far)
+    float opacity = mix(0.05, 0.3, colorMix);
+    
+    gl_FragColor = vec4(finalColor, opacity);
+  }
+`
+
 export function Brainy(props) {
   const group = useRef()
-  const { scene, nodes } = useGLTF('/models/brain.glb')
-  
-  // Load gradient texture for toon shading
+  const { scene } = useGLTF('/models/brain.glb')
+  const mousePosition = useRef(new THREE.Vector3())
+  const raycaster = useRef(new THREE.Raycaster())
   const gradientMap = useTexture('/gradients/5.jpg')
   
   // Create materials
@@ -30,11 +77,15 @@ export function Brainy(props) {
   }, [gradientMap])
   
   const wireframeMaterial = useMemo(() => {
-    return new THREE.MeshBasicMaterial({
-      color: new THREE.Color('#4086f4'), // Electric blue
-      wireframe: true,
+    return new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms: {
+        time: { value: 0 },
+        mousePosition: { value: new THREE.Vector3(0, 0, 100) }
+      },
       transparent: true,
-      opacity: 0.1,
+      wireframe: true,
     })
   }, [])
   
@@ -61,7 +112,7 @@ export function Brainy(props) {
     return clonedScene
   }, [scene, wireframeMaterial])
   
-  // Animation
+  // Animation and interaction
   useFrame((state) => {
     if (group.current) {
       // Mouse-based rotation
@@ -71,29 +122,39 @@ export function Brainy(props) {
       group.current.rotation.y = -Math.PI/2 + mouseX
       group.current.rotation.x = mouseY
       
-      // Animate materials
+      // Update mouse position for shader
+      raycaster.current.setFromCamera(state.mouse, state.camera)
+      const intersects = raycaster.current.intersectObject(group.current, true)
+      
+      if (intersects.length > 0) {
+        mousePosition.current.copy(intersects[0].point)
+      }      // Update shader uniforms
       const t = state.clock.getElapsedTime()
+      wireframeMaterial.uniforms.time.value = t
+      
+      // Update mouse position with fallback
+      if (intersects.length > 0) {
+        mousePosition.current.copy(intersects[0].point)
+      } else {
+        // Move mouse position far away when not hovering
+        mousePosition.current.set(1000, 1000, 1000)
+      }
+      wireframeMaterial.uniforms.mousePosition.value.copy(mousePosition.current)
       
       // Toon material animation
       const pulse = Math.sin(t * 0.5) * 0.1 + 0.9
       toonMaterial.color.setRGB(0.25 + 0.1 * pulse, 0.4 + 0.1 * pulse, 0.96)
       toonMaterial.emissiveIntensity = 0.1 + Math.sin(t * 0.7) * 0.1
-      
-      // Wireframe animation
-      wireframeMaterial.opacity = 0.1 + Math.sin(t) * 0.2
-      const hue = (t * 0.05) % 1
-      wireframeMaterial.color.setHSL(hue, 0.8, 0.5)
     }
   })
   
   return (
     <group {...props}>
-      <group ref={group}>
-        {/* Original model with toon material */}
-        <primitive object={toonBrain} />
+      <group ref={group}>        {/* Original model with toon material */}
+        <Clone object={toonBrain} />
         
         {/* Wireframe overlay */}
-        <primitive object={wireframeBrain} />
+        <Clone object={wireframeBrain} />
       </group>
     </group>
   )

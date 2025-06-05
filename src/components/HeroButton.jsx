@@ -1,5 +1,3 @@
-import React from 'react';
-
 const HeroButton = () => {
   return (
       <div className="flex md:w-80 md:h-16 w-60 h-12"> 

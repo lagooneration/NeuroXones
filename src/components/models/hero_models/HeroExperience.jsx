@@ -18,7 +18,7 @@ const HeroExperience = () => {
       <ambientLight intensity={0.2} />
       <OrbitControls
         enablePan={false}
-        enableZoom={false}
+        enableZoom={true}
         maxDistance={20}
         minDistance={5}
         minPolarAngle={Math.PI / 5}
@@ -48,7 +48,7 @@ const HeroExperience = () => {
       </Suspense>
 
       <EffectComposer>
-        <Bloom luminanceThreshold={.1} luminanceSmoothing={0.9} height={500} />
+        <Bloom luminanceThreshold={.9} luminanceSmoothing={0.9} height={500} />
       </EffectComposer>
     </Canvas>
   );
