@@ -192,7 +192,7 @@ body {
   }
 
   .hero-layout {
-    @apply relative z-10 xl:mt-20 mt-32 md:h-dvh h-[80vh] flex xl:items-center items-start justify-center;
+    @apply relative z-10 xl:mt-12 mt-12 md:h-dvh h-[80vh] flex xl:items-center items-start justify-center;
   }
 
   .hero-text {
@@ -210,7 +210,9 @@ body {
   }
 
   .hero-3d-layout {
-    @apply xl:w-[70%] w-full h-full min-h-[50vh] absolute xl:-top-20 top-24 xl:-right-20 right-0;
+    @apply w-full sm:w-full md:w-full lg:w-[80%] xl:w-[70%] h-full min-h-[40vh] sm:min-h-[45vh] md:min-h-[50vh] 
+    absolute top-32 sm:top-28 md:top-28 lg:top-28 xl:-top-20 
+    right-0 xl:-right-20;
   }
 
   .navbar {

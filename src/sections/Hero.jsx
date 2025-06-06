@@ -1,25 +1,14 @@
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
 import Aurora from "../components/Aurora";
 import TrueFocus from '../components/TrueFocus';
 import HeroButton from "../components/HeroButton";
-import { words } from "../constants";
 import HeroExperience from "../components/models/hero_models/HeroExperience";
 
 const Hero = () => {
-  useGSAP(() => {
-    gsap.fromTo(
-      ".hero-text h1",
-      { y: 50, opacity: 0 },
-      { y: 0, opacity: 1, stagger: 0.2, duration: 1, ease: "power2.inOut" }
-    );
-  });
-
   return (
-    <section id="hero" className="relative overflow-hidden">
-      <div className="absolute top-0 left-0 z-10">
-        <img src="/images/bg.png" alt="" />
-      </div>
+    <section id="hero" className="relative w-full overflow-hidden">
+      {/* <div className="absolute top-0 left-0 z-10 w-full">
+        <img src="/images/bg.png" alt="" className="w-full h-auto" />
+      </div> */}
       <div className="absolute w-full z-10">
         <Aurora
           colorStops={["#3A29FF", "#FF94B4", "#FF3232"]}
@@ -29,36 +18,14 @@ const Hero = () => {
         />
       </div>
 
-      <div className="hero-layout">
+      <div className="relative z-10 mt-20 sm:mt-24 md:mt-28 xl:mt-20 w-full h-[80vh] md:h-dvh flex flex-col xl:flex-row items-start xl:items-center justify-center px-3 sm:px-5 md:px-6 xl:px-0">
         {/* LEFT: Hero Content */}
-        <header className="flex flex-col justify-center md:w-full w-screen md:px-20 px-5 py-5">
-          <div className="flex flex-col gap-7">
-              <img src="/assets/logos/heading.svg" alt="Heading" className="w-48" />
-            {/* <div className="hero-text">
-              <h1>
-                <span className="slide">
-                  <span className="wrapper">
-                    {words.map((word, index) => (
-                      <span
-                        key={index}
-                        className="flex items-center md:gap-3 gap-1 pb-2"
-                      >
-                        <img
-                          src={word.imgPath}
-                          alt="person"
-                          className="xl:size-12 md:size-10 size-7 md:p-2 p-1 rounded-full bg-white-50"
-                        />
-                        <span>{word.text}</span>
-                      </span>
-                    ))}
-                  </span>
-                </span>
-              </h1>
-              <h1>.</h1>
-            </div> */}
+        <header className="flex flex-col justify-center w-full max-w-full md:max-w-[90%] lg:max-w-[80%] xl:max-w-[50%] px-2 sm:px-4 md:px-6 lg:px-10 xl:px-20 py-5">
+          <div className="flex flex-col gap-4 md:gap-7">
+              <img src="/assets/logos/heading.svg" alt="Heading" className="w-36 sm:w-42 md:w-48" />
 
-            
-            <div className="flex items-center gap-4">
+
+              <div className="flex items-start gap-2 md:gap-4">
               <TrueFocus 
                 sentence="Attention Detection"
                 manualMode={false}
@@ -68,18 +35,20 @@ const Hero = () => {
                 pauseBetweenAnimations={1}
               />
             </div>
-            <p className="text-white-50 md:text-xl relative z-10 pointer-events-none">
+            <p className="text-white-50 text-sm sm:text-base md:text-lg lg:text-xl relative z-10 pointer-events-none">
               Integrated Brain Computer Interface (BCI).
             </p>
-            <HeroButton> 
-              Simulate
+            <div className="mt-2">
+              <HeroButton> 
+                Simulate
               </HeroButton>
+            </div>
           </div>
         </header>
 
         {/* RIGHT: 3D Model or Visual */}
-        <figure>
-          <div className="hero-3d-layout">
+        <figure className="w-full xl:w-1/2 h-[50vh] md:h-[60vh] xl:h-full relative">
+          <div className="w-full h-full absolute top-0 right-0">
             <HeroExperience />
           </div>
         </figure>

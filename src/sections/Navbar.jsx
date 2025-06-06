@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
+import ContactButton from "../components/ContactButton";
+
 function Navigation() {
   return (
     <ul className="nav-ul">
@@ -9,18 +11,18 @@ function Navigation() {
         </a>
       </li>
       <li className="nav-li">
-        <a className="nav-link" href="#about">
-          About
-        </a>
-      </li>
-      <li className="nav-li">
         <a className="nav-link" href="#work">
           Simulation
         </a>
       </li>
       <li className="nav-li">
+        <a className="nav-link" href="#about">
+          About
+        </a>
+      </li>
+      <li className="nav-li">
         <a className="nav-link" href="#contact">
-          Contact
+          <ContactButton />
         </a>
       </li>
     </ul>
