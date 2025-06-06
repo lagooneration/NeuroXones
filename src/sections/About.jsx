@@ -7,12 +7,14 @@ import { Canvas } from "@react-three/fiber";
 import SimButton from "../components/SimButton";
 import { NeuralActivity } from "../components/NeuralActivity";
 import SpotlightCard from "../components/SpotlightCard";
+import Attention from './Attention';
 
 const About = () => {
   const grid2Container = useRef();
   const brainRef = useRef();
   return (
     <section className="c-space section-spacing" id="about">
+    <Attention />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-6 md:auto-rows-[18rem] mt-12">
         {/* Grid 1 */}
         <div className="flex items-end grid-default-color grid-1">

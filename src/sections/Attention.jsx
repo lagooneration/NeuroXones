@@ -3,7 +3,7 @@ import TextPressure from '../components/TextPressure';
 
 const Attention = () => {
     return (
-        <div style={{width: '100%', height: '260px', position: 'relative', margin: '12px' }}>
+        <div className="w-full relative mx-3 h-[80px] md:h-[240px] sm:h-[120px] xs:h-[80px]">
             <TextPressure
                 text="ATTENTION!"
                 flex={true}

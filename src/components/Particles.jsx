@@ -1,270 +1,222 @@
 import { twMerge } from "tailwind-merge";
-import React, { useEffect, useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { Canvas, useThree, useFrame, extend } from "@react-three/fiber";
+import * as THREE from "three";
 
-function MousePosition() {
-  const [mousePosition, setMousePosition] = useState({
-    x: 0,
-    y: 0,
-  });
+// Create a shader material for the neural network effect
+class NeuralNetworkMaterial extends THREE.ShaderMaterial {
+  constructor() {
+    super({
+      uniforms: {
+        time: { value: 0 },
+        resolution: { value: new THREE.Vector2() },
+        mousePosition: { value: new THREE.Vector2(0.5, 0.5) },
+        colorIntensity: { value: 2.0 }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float time;
+        uniform vec2 resolution;
+        uniform vec2 mousePosition;
+        uniform float colorIntensity;
+        varying vec2 vUv;
 
-  useEffect(() => {
-    const handleMouseMove = (event) => {
-      setMousePosition({ x: event.clientX, y: event.clientY });
-    };
+        #define S(a, b, t) smoothstep(a, b, t)
+        #define NUM_LAYERS 4.
 
-    window.addEventListener("mousemove", handleMouseMove);
+        float N21(vec2 p) {
+          vec3 a = fract(vec3(p.xyx) * vec3(613.897, 553.453, 80.098));
+          a += dot(a, a.yzx + 88.76);
+          return fract((a.x + a.y) * a.z);
+        }
 
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
-  }, []);
+        vec2 GetPos(vec2 id, vec2 offs, float t) {
+          float n = N21(id+offs);
+          float n1 = fract(n*0.7);
+          float n2 = fract(n*79.7);
+          float a = t+n;
+          return offs + vec2(sin(a*n1), cos(a*n2))*0.5;
+        }
 
-  return mousePosition;
-}
+        float GetT(vec2 ro, vec2 rd, vec2 p) {
+          return dot(p-ro, rd); 
+        }
 
-function hexToRgb(hex) {
-  hex = hex.replace("#", "");
+        float LineDist(vec3 a, vec3 b, vec3 p) {
+          return length(cross(b-a, p-a))/length(p-a);
+        }
 
-  if (hex.length === 3) {
-    hex = hex
-      .split("")
-      .map((char) => char + char)
-      .join("");
+        float df_line(in vec2 a, in vec2 b, in vec2 p) {
+          vec2 pa = p - a, ba = b - a;
+          float h = clamp(dot(pa,ba) / dot(ba,ba), 0., 1.);	
+          return length(pa - ba * h);
+        }
+
+        float line(vec2 a, vec2 b, vec2 uv) {
+          float r1 = 0.002;
+          float r2 = .0001;
+          
+          float d = df_line(a, b, uv);
+          float d2 = length(a-b);
+          float fade = S(0.005, .05, d2);
+          
+          fade += S(.0005, .0002, abs(d2-.025));
+          return S(r1, r2, d)*fade;
+        }
+
+        float NetLayer(vec2 st, float n, float t) {
+          vec2 id = floor(st)+n;
+
+          st = fract(st)-.5;
+        
+          vec2 p[9];
+          int i=0;
+          for(float y=-1.; y<=1.; y++) {
+            for(float x=-1.; x<=1.; x++) {
+                p[i++] = GetPos(id, vec2(x,y), t);
+            }
+          }
+          
+          float m = 0.;
+          float sparkle = 0.;
+          
+          for(int i=0; i<9; i++) {
+            m += line(p[4], p[i], st);
+
+            float d = length(st-p[i]);
+
+            float s = (.002/(d*d));
+            s *= S(1., .1, d);
+            float pulse = sin((fract(p[i].x)+fract(p[i].y)+t)*5.)*.4+.6;
+            pulse = pow(pulse, 20.);
+
+            s *= pulse;
+            sparkle += s;
+          }
+          
+          m += line(p[1], p[3], st);
+          m += line(p[1], p[5], st);
+          m += line(p[7], p[5], st);
+          m += line(p[7], p[3], st);
+          
+          float sPhase = (sin(t+n)+sin(t*.1))*.25+.5;
+          sPhase += pow(sin(t*.1)*.5+.5, 50.)*5.;
+          m += sparkle*sPhase;
+          
+          return m;
+        }
+
+        void main() {
+          vec2 uv = (gl_FragCoord.xy / resolution.xy) * 2.0 - 1.0;
+          uv.x *= resolution.x / resolution.y; // Correct for aspect ratio
+          
+          vec2 mouse = mousePosition * 2.0 - 1.0; // Normalize mouse position
+          
+          float t = time * 0.5;
+          
+          float s = sin(t * 0.2);
+          float c = cos(t * 0.2);
+          mat2 rot = mat2(c, -s, s, c);
+          vec2 st = uv * rot;
+          mouse = mouse * rot * 0.3;
+          
+          float m = 0.;
+          for(float i=0.; i<1.; i+=1./NUM_LAYERS) {
+            float z = fract(t*0.2+i);
+            float size = mix(15., 1.5, z);
+            float fade = S(0., .3, z) * S(1., .7, z);
+            
+            m += fade * NetLayer(st*size-mouse*z, i, time * 0.5);
+          }
+          
+          vec3 baseCol = vec3(s * 0.5 + 0.5, cos(t*0.1) * 0.5 + 0.5, -sin(t*0.14) * 0.5 + 0.5) * 0.2 + 0.1;
+          baseCol = mix(baseCol, vec3(0.3, 0.4, 1.0), 0.5); // Add more blue shade for neural network feel
+          
+          vec3 col = baseCol * m * colorIntensity;
+          
+          // Add subtle glow effect
+          float glow = -uv.y * 0.4;
+          col += baseCol * glow;
+          
+          // Vignette effect
+          col *= 1.0 - length(uv * vec2(0.8, 1.2)) * 0.6;
+          
+          gl_FragColor = vec4(col, m * 0.75 + 0.2);
+        }
+      `,
+      transparent: true,
+      depthWrite: false
+    });
   }
-
-  const hexInt = parseInt(hex, 16);
-  const red = (hexInt >> 16) & 255;
-  const green = (hexInt >> 8) & 255;
-  const blue = hexInt & 255;
-  return [red, green, blue];
 }
 
+// Register the material as a custom element
+extend({ NeuralNetworkMaterial });
+
+// Create the full screen quad that will render our shader
+function NeuralNetwork() {
+  const materialRef = useRef();
+  const { size } = useThree();
+  const [mousePosition, setMousePosition] = useState([0.5, 0.5]);
+  
+  // Handle mouse movements
+  useEffect(() => {
+    function handleMouseMove(e) {
+      setMousePosition([
+        e.clientX / window.innerWidth, 
+        1 - (e.clientY / window.innerHeight) // Flip Y coordinates
+      ]);
+    }
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+  
+  // Update shader uniforms on each frame
+  useFrame((state) => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.time.value = state.clock.elapsedTime;
+      materialRef.current.uniforms.resolution.value.set(size.width, size.height);
+      materialRef.current.uniforms.mousePosition.value.set(mousePosition[0], mousePosition[1]);
+    }
+  });
+  
+  return (
+    <mesh>
+      <planeGeometry args={[2, 2]} />
+      <neuralNetworkMaterial ref={materialRef} />
+    </mesh>
+  );
+}
+
+// Main component exported to be used in the app
 export const Particles = ({
   className = "",
-  quantity = 100,
-  staticity = 50,
-  ease = 50,
-  size = 0.4,
-  refresh = false,
-  color = "#ffffff",
-  vx = 0,
-  vy = 0,
   ...props
 }) => {
-  const canvasRef = useRef(null);
-  const canvasContainerRef = useRef(null);
-  const context = useRef(null);
-  const circles = useRef([]);
-  const mousePosition = MousePosition();
-  const mouse = useRef({ x: 0, y: 0 });
-  const canvasSize = useRef({ w: 0, h: 0 });
-  const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
-  const rafID = useRef(null);
-  const resizeTimeout = useRef(null);
-
-  useEffect(() => {
-    if (canvasRef.current) {
-      context.current = canvasRef.current.getContext("2d");
-    }
-    initCanvas();
-    animate();
-
-    const handleResize = () => {
-      if (resizeTimeout.current) {
-        clearTimeout(resizeTimeout.current);
-      }
-      resizeTimeout.current = setTimeout(() => {
-        initCanvas();
-      }, 200);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      if (rafID.current != null) {
-        window.cancelAnimationFrame(rafID.current);
-      }
-      if (resizeTimeout.current) {
-        clearTimeout(resizeTimeout.current);
-      }
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [color]);
-
-  useEffect(() => {
-    onMouseMove();
-  }, [mousePosition.x, mousePosition.y]);
-
-  useEffect(() => {
-    initCanvas();
-  }, [refresh]);
-
-  const initCanvas = () => {
-    resizeCanvas();
-    drawParticles();
-  };
-
-  const onMouseMove = () => {
-    if (canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      const { w, h } = canvasSize.current;
-      const x = mousePosition.x - rect.left - w / 2;
-      const y = mousePosition.y - rect.top - h / 2;
-      const inside = x < w / 2 && x > -w / 2 && y < h / 2 && y > -h / 2;
-      if (inside) {
-        mouse.current.x = x;
-        mouse.current.y = y;
-      }
-    }
-  };
-
-  const resizeCanvas = () => {
-    if (canvasContainerRef.current && canvasRef.current && context.current) {
-      canvasSize.current.w = canvasContainerRef.current.offsetWidth;
-      canvasSize.current.h = canvasContainerRef.current.offsetHeight;
-
-      canvasRef.current.width = canvasSize.current.w * dpr;
-      canvasRef.current.height = canvasSize.current.h * dpr;
-      canvasRef.current.style.width = `${canvasSize.current.w}px`;
-      canvasRef.current.style.height = `${canvasSize.current.h}px`;
-      context.current.scale(dpr, dpr);
-
-      // Clear existing particles and create new ones with exact quantity
-      circles.current = [];
-      for (let i = 0; i < quantity; i++) {
-        const circle = circleParams();
-        drawCircle(circle);
-      }
-    }
-  };
-
-  const circleParams = () => {
-    const x = Math.floor(Math.random() * canvasSize.current.w);
-    const y = Math.floor(Math.random() * canvasSize.current.h);
-    const translateX = 0;
-    const translateY = 0;
-    const pSize = Math.floor(Math.random() * 2) + size;
-    const alpha = 0;
-    const targetAlpha = parseFloat((Math.random() * 0.6 + 0.1).toFixed(1));
-    const dx = (Math.random() - 0.5) * 0.1;
-    const dy = (Math.random() - 0.5) * 0.1;
-    const magnetism = 0.1 + Math.random() * 4;
-    return {
-      x,
-      y,
-      translateX,
-      translateY,
-      size: pSize,
-      alpha,
-      targetAlpha,
-      dx,
-      dy,
-      magnetism,
-    };
-  };
-
-  const rgb = hexToRgb(color);
-
-  const drawCircle = (circle, update = false) => {
-    if (context.current) {
-      const { x, y, translateX, translateY, size, alpha } = circle;
-      context.current.translate(translateX, translateY);
-      context.current.beginPath();
-      context.current.arc(x, y, size, 0, 2 * Math.PI);
-      context.current.fillStyle = `rgba(${rgb.join(", ")}, ${alpha})`;
-      context.current.fill();
-      context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      if (!update) {
-        circles.current.push(circle);
-      }
-    }
-  };
-
-  const clearContext = () => {
-    if (context.current) {
-      context.current.clearRect(
-        0,
-        0,
-        canvasSize.current.w,
-        canvasSize.current.h
-      );
-    }
-  };
-
-  const drawParticles = () => {
-    clearContext();
-    const particleCount = quantity;
-    for (let i = 0; i < particleCount; i++) {
-      const circle = circleParams();
-      drawCircle(circle);
-    }
-  };
-
-  const remapValue = (value, start1, end1, start2, end2) => {
-    const remapped =
-      ((value - start1) * (end2 - start2)) / (end1 - start1) + start2;
-    return remapped > 0 ? remapped : 0;
-  };
-
-  const animate = () => {
-    clearContext();
-    circles.current.forEach((circle, i) => {
-      // Handle the alpha value
-      const edge = [
-        circle.x + circle.translateX - circle.size, // distance from left edge
-        canvasSize.current.w - circle.x - circle.translateX - circle.size, // distance from right edge
-        circle.y + circle.translateY - circle.size, // distance from top edge
-        canvasSize.current.h - circle.y - circle.translateY - circle.size, // distance from bottom edge
-      ];
-      const closestEdge = edge.reduce((a, b) => Math.min(a, b));
-      const remapClosestEdge = parseFloat(
-        remapValue(closestEdge, 0, 20, 0, 1).toFixed(2)
-      );
-      if (remapClosestEdge > 1) {
-        circle.alpha += 0.02;
-        if (circle.alpha > circle.targetAlpha) {
-          circle.alpha = circle.targetAlpha;
-        }
-      } else {
-        circle.alpha = circle.targetAlpha * remapClosestEdge;
-      }
-      circle.x += circle.dx + vx;
-      circle.y += circle.dy + vy;
-      circle.translateX +=
-        (mouse.current.x / (staticity / circle.magnetism) - circle.translateX) /
-        ease;
-      circle.translateY +=
-        (mouse.current.y / (staticity / circle.magnetism) - circle.translateY) /
-        ease;
-
-      drawCircle(circle, true);
-
-      // circle gets out of the canvas
-      if (
-        circle.x < -circle.size ||
-        circle.x > canvasSize.current.w + circle.size ||
-        circle.y < -circle.size ||
-        circle.y > canvasSize.current.h + circle.size
-      ) {
-        // remove the circle from the array
-        circles.current.splice(i, 1);
-        // create a new circle
-        const newCircle = circleParams();
-        drawCircle(newCircle);
-      }
-    });
-    rafID.current = window.requestAnimationFrame(animate);
-  };
-
   return (
     <div
       className={twMerge("pointer-events-none", className)}
-      ref={canvasContainerRef}
       aria-hidden="true"
       {...props}
+      style={{ width: '100%', height: '100%', ...props.style }}
     >
-      <canvas ref={canvasRef} className="size-full" />
+      <Canvas
+        camera={{ position: [0, 0, 1] }}
+        gl={{ 
+          antialias: false, 
+          alpha: true,
+          powerPreference: "high-performance"
+        }}
+      >
+        <NeuralNetwork />
+      </Canvas>
     </div>
   );
 };
