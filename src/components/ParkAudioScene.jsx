@@ -95,16 +95,22 @@ const AudioController = ({ onPositionChange }) => {
         <div className="absolute h-full w-px bg-gray-700 left-1/2 transform -translate-x-1/2" />
         
         {/* Points of interest */}
-        <div 
-          className="absolute top-1/2 left-1/2 w-3 h-3 bg-blue-500 rounded-full transform -translate-x-1/2 -translate-y-1/2" 
+        <img 
+          src="/icons/fountain.svg"
+          alt="Fountain"
+          className="absolute top-1/2 left-1/2 w-10 h-10 transform -translate-x-1/2 -translate-y-1/2 filter drop-shadow-[0_0_8px_rgba(77,171,247,0.5)]" 
           title="Fountain"
         />
-        <div 
-          className="absolute top-[30%] left-[70%] w-3 h-3 bg-yellow-500 rounded-full" 
+        <img 
+          src="/icons/bird.svg"
+          alt="Birds"
+          className="absolute top-[30%] left-[70%] w-10 h-10 filter drop-shadow-[0_0_8px_rgba(255,212,59,0.5)]" 
           title="Birds"
         />
-        <div 
-          className="absolute top-[85%] left-[15%] w-3 h-3 bg-red-500 rounded-full" 
+        <img 
+          src="/icons/traffic.svg"
+          alt="Traffic"
+          className="absolute top-[85%] left-[15%] w-10 h-10 filter drop-shadow-[0_0_8px_rgba(255,107,107,0.5)]" 
           title="Traffic"
         />
       </div>

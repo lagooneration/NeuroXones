@@ -68,7 +68,6 @@ const Hero = () => {
               id="counter"
             /> */}
             <HeroButton> 
-              <link href="/simulation" rel="preload" as="fetch" />  
               Simulate
               </HeroButton>
           </div>
