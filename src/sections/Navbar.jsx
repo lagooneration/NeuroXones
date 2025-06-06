@@ -36,7 +36,7 @@ const Navbar = () => {
             href="/"
             className="text-xl font-bold transition-colors text-neutral-400 hover:text-white"
           >
-            Neuroxones
+            <img src="/assets/logos/logo-gray.svg" alt="Logo" className="h-6" />
           </a>
           <button
             onClick={() => setIsOpen(!isOpen)}

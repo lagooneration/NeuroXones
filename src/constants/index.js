@@ -78,17 +78,17 @@ export const myProjects = [
 export const mySocials = [
   {
     name: "WhatsApp",
-    href: "",
+    href: "https://wa.me/919478972509?text=Hello!%20I'm%20interested%20in%20knowing%20more%20about%20neuroxones!",
     icon: "/assets/socials/whatsApp.svg",
   },
   {
     name: "Linkedin",
-    href: "https://www.linkedin.com/in/ali-sanati/",
+    href: "https://www.linkedin.com/in/lagooneration/",
     icon: "/assets/socials/linkedIn.svg",
   },
   {
     name: "Instagram",
-    href: "https://www.instagram.com/ali.sanatidev/reels/",
+    href: "https://www.instagram.com/lagooneration",
     icon: "/assets/socials/instagram.svg",
   },
 ];

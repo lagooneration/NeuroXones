@@ -1,7 +1,7 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import Aurora from "../components/Aurora";
-
+import TrueFocus from '../components/TrueFocus';
 import HeroButton from "../components/HeroButton";
 import { words } from "../constants";
 import HeroExperience from "../components/models/hero_models/HeroExperience";
@@ -33,9 +33,9 @@ const Hero = () => {
         {/* LEFT: Hero Content */}
         <header className="flex flex-col justify-center md:w-full w-screen md:px-20 px-5 py-5">
           <div className="flex flex-col gap-7">
-            <div className="hero-text">
+              <img src="/assets/logos/heading.svg" alt="Heading" className="w-48" />
+            {/* <div className="hero-text">
               <h1>
-              NeuroXones <br />
                 <span className="slide">
                   <span className="wrapper">
                     {words.map((word, index) => (
@@ -55,18 +55,22 @@ const Hero = () => {
                 </span>
               </h1>
               <h1>.</h1>
-              <h1></h1>
+            </div> */}
+
+            
+            <div className="flex items-center gap-4">
+              <TrueFocus 
+                sentence="Attention Detection"
+                manualMode={false}
+                blurAmount={5}
+                borderColor="green"
+                animationDuration={2}
+                pauseBetweenAnimations={1}
+              />
             </div>
-
             <p className="text-white-50 md:text-xl relative z-10 pointer-events-none">
-              Auditory Attention Detection Headphones
+              Integrated Brain Computer Interface (BCI).
             </p>
-
-            {/* <Button
-              text="Get Started"
-              className="md:w-80 md:h-16 w-60 h-12"
-              id="counter"
-            /> */}
             <HeroButton> 
               Simulate
               </HeroButton>

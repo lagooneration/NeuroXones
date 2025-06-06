@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { useMediaQuery } from "react-responsive";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { Suspense } from "react";
-import { Brainy } from "../../models/Brainy";
+import { Brain } from "../../models/Brain";
 import { Hp } from "../Hp";
 import HeroLights from "./HeroLights";
 
@@ -34,7 +34,7 @@ const HeroExperience = () => {
           position={[0, -2, 0]}
           rotate={[0, Math.PI * 1.75, 0]}
         >
-          <Brainy />
+          <Brain />
         </group>
 
         {/* HP model group - positioned relative to brain */}
