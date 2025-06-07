@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const ContactButton = () => {
+const ContactButton = ({ className }) => {
   return (
-    <StyledWrapper>
+    <StyledWrapper className={className}>
       <button>
         <p>Reach Out</p>
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
@@ -28,10 +28,11 @@ const StyledWrapper = styled.div`
     --hovered-color:rgb(240, 240, 240);
     position: relative;
     display: flex;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 20px;
     gap: 0.5rem;
     align-items: center;
+    justify-content: center;
   }
 
   button p {
@@ -84,4 +85,4 @@ const StyledWrapper = styled.div`
     transition-delay: 0.2s;
   }`;
 
-export default ContactButton;
+export default ContactButton; 

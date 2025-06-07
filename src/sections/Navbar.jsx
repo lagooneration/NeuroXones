@@ -2,27 +2,26 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import ContactButton from "../components/ContactButton";
 
-function Navigation() {
+function Navigation({ isMobile }) {
   return (
-    <ul className="nav-ul">
+    <ul className={`nav-ul ${isMobile ? "flex flex-col space-y-6" : ""}`}>
       <li className="nav-li">
-        <a className="nav-link" href="#home">
+        <a className={`nav-link ${isMobile ? "text-xl text-white/80 hover:text-white" : ""}`} href="#home">
           Home
         </a>
       </li>
       <li className="nav-li">
-        <a className="nav-link" href="#work">
+        <a className={`nav-link ${isMobile ? "text-xl text-white/80 hover:text-white" : ""}`} href="#work">
           Simulation
         </a>
       </li>
       <li className="nav-li">
-        <a className="nav-link" href="#about">
+        <a className={`nav-link ${isMobile ? "text-xl text-white/80 hover:text-white" : ""}`} href="#about">
           About
         </a>
-      </li>
-      <li className="nav-li">
-        <a className="nav-link" href="#contact">
-          <ContactButton />
+      </li>      <li className={`nav-li ${isMobile ? "flex justify-center mt-6" : ""}`}>
+        <a className={`nav-link ${isMobile ? "flex justify-center w-full" : ""}`} href="#contact">
+          <ContactButton className={isMobile ? "mx-auto" : ""} />
         </a>
       </li>
     </ul>
@@ -49,22 +48,20 @@ const Navbar = () => {
               className="w-6 h-6"
               alt="toggle"
             />
-          </button>
-          <nav className="hidden sm:flex">
-            <Navigation />
+          </button>          <nav className="hidden sm:flex">
+            <Navigation isMobile={false} />
           </nav>
         </div>
-      </div>
-      {isOpen && (
+      </div>      {isOpen && (
         <motion.div
-          className="block overflow-hidden text-center sm:hidden"
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
+          className="block overflow-hidden text-center sm:hidden bg-black/80 backdrop-blur-md"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
           style={{ maxHeight: "100vh" }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.5 }}
         >
-          <nav className="pb-5">
-            <Navigation />
+          <nav className="py-8 flex flex-col">
+            <Navigation isMobile={true} />
           </nav>
         </motion.div>
       )}

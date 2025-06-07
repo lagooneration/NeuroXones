@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from 'react';
 import emailjs from "@emailjs/browser";
 import Alert from "../components/Alert";
 import { Particles } from "../components/Particles";
+// import MatellicPaint from '../components/MatellicPaint';
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -50,6 +52,9 @@ const Contact = () => {
       showAlertMessage("danger", "Somthing went wrong!");
     }
   };
+
+
+  
   return (
     
     <section id="contact" className="relative flex items-center c-space section-spacing">
@@ -70,9 +75,7 @@ const Contact = () => {
         </div>
         <form className="w-full" onSubmit={handleSubmit}>
           <div className="mb-5">
-            {/* <label htmlFor="name" className="feild-label">
-              Full Name
-            </label> */}
+
             <input
               id="name"
               name="name"
@@ -86,9 +89,6 @@ const Contact = () => {
             />
           </div>
           <div className="mb-5">
-            {/* <label htmlFor="email" className="feild-label">
-              Email
-            </label> */}
             <input
               id="email"
               name="email"
@@ -102,9 +102,6 @@ const Contact = () => {
             />
           </div>
           <div className="mb-5">
-            {/* <label htmlFor="message" className="feild-label">
-              Message
-            </label> */}
             <textarea
               id="message"
               name="message"
@@ -132,3 +129,7 @@ const Contact = () => {
 };
 
 export default Contact;
+
+
+
+  

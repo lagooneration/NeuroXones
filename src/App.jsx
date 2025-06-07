@@ -8,12 +8,14 @@ import Testimonial from "./sections/Testimonial";
 import Contact from "./sections/Contact";
 import Footer from './sections/Footer';
 import AudioExperience from './sections/AudioExperience';
+import Algo from './sections/Algo';
 
 const HomePage = () => (
   <>
     <Hero />
     <About />
     <Projects />
+    <Algo />
     <Experiences />
     <Testimonial />
     <Contact />

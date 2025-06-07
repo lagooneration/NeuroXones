@@ -75,7 +75,7 @@ const About = () => {
               <NeuralActivity
                 scale={1.25}
                 position={[0.8, -0.2, 0.16]}
-                rotation={[-Math.PI/2, -Math.PI / 24, 0]}
+                rotation={[-Math.PI/2, -Math.PI / 72, 0]}
                 color="#4f9dff"
               />
               {/* <Lights brainRotation={brainRef.current?.rotation.y || 0} /> */}
