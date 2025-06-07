@@ -36,7 +36,7 @@ const HeroExperience = () => {
         
         {/* Brain model group */}
         <group
-          scale={isSmallMobile ? [21, 21, 21] : isMobile ? [13.5, 13.5, 13.5] : [15, 15, 15]}
+          scale={isSmallMobile ? [21, 21, 21] : isMobile ? [21, 21, 21] : [15, 15, 15]}
           position={isSmallMobile ? [0, -2.0, 0] : isMobile ? [0, -1.8, 0] : [0, -1.2, 0]}
           rotation={[0, -Math.PI * 1.85, 0]}
         >
@@ -45,7 +45,7 @@ const HeroExperience = () => {
 
         {/* HP model group - positioned relative to brain */}
         <group
-          scale={isSmallMobile ? [27, 27, 27] : isMobile ? [18.5, 18.5, 18.5] : [20, 20, 20]}
+          scale={isSmallMobile ? [27, 27, 27] : isMobile ? [27, 27, 27] : [20, 20, 20]}
           position={isSmallMobile ? [0, -4.5, 0] : isMobile ? [0, -3.8, 0] : [0, -3.2, 0]}
           rotation={[0, -Math.PI * 1.85, 0]}
         >

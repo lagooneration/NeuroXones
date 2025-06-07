@@ -1,12 +1,8 @@
 import { useRef } from "react";
  import { Braint } from "../components/Braint";
-// import { Lights } from "../components/Lights";
-// import CopyEmailButton from "../components/CopyEmailButton";
-import { Frameworks } from "../components/FrameWorks";
 import { Canvas } from "@react-three/fiber";
 import SimButton from "../components/SimButton";
 import { NeuralActivity } from "../components/NeuralActivity";
-import SpotlightCard from "../components/SpotlightCard";
 import Attention from './Attention';
 
 const About = () => {
@@ -31,21 +27,21 @@ const About = () => {
           <div className="absolute inset-x-0 pointer-evets-none -bottom-4 h-1/2 sm:h-1/3 bg-gradient-to-t from-indigo" />
         </div>
         {/* Grid 2 */}
-        <div className="grid-default-color grid-2">
-          <div
+        <div className="grid-default-color grid-2">        
+        <div
             ref={grid2Container}
             className="flex items-center justify-center w-full h-full"
           >
             <img
-            src="assets/ci.png"
-            className="absolute z-0 -top-[80px]"
+            src="images/vr.png"
+            className="absolute z-0 -top-[30px]"
             alt=""
           />
           <div className="z-10">
-            <p className="absolute left-4 bottom-4 headtext">Cochlear Implant Integration</p>
+            <p className="absolute left-4 bottom-4 headtext">AR/VR Integration</p>
           </div>
         </div>
-        
+
         </div>
         {/* Grid 3 */}
         <div className="grid-black-color grid-3">
@@ -89,21 +85,24 @@ const About = () => {
               Experience Neuro-Steered listening?
             </p>
             <SimButton />
-          {/* <SpotlightCard className="h-fit w-fit" spotlightColor="rgba(0, 229, 255, 0.2)">
-          </SpotlightCard> */}
+
           </div>
         </div>
         {/* Grid 5 */}
         <div className="grid-default-color grid-5">
-          <div className="z-10 w-[50%]">
-            <p className="headText">Industrial Applications</p>
-            <p className="subtext">
-              Can be used in industries, like healthcare, education, military and entertainment, to enhance auditory experiences.
-            </p>
+           <div
+            ref={grid2Container}
+            className="flex items-center justify-center w-full h-full"
+          >
+            <img
+            src="assets/ci.png"
+            className="absolute z-0 -top-[80px]"
+            alt=""
+          />
+          <div className="z-10">
+            <p className="absolute left-4 bottom-4 headtext">Cochlear Implant Integration</p>
           </div>
-          <div className="absolute inset-y-0 md:inset-y-9 w-full h-full start-[50%] md:scale-125">
-            <Frameworks />
-          </div>
+        </div>
         </div>
       </div>
     </section>

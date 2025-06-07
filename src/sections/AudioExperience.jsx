@@ -17,12 +17,11 @@ const AudioExperience = () => {
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M15 10H5M5 10L10 15M5 10L10 5" />
           </svg>
-          Back to Home
+          Home
         </Link>
       </div>
       <div className="absolute top-12 left-1/2 -translate-x-1/2 text-center z-10">
-        <h1 className="text-2xl font-bold text-black mb-1">Interactive Audio Experience</h1>
-        <p className="text-gray-800 text-sm">Move the cursor to explore different sounds in the park</p>
+        <h1 className="text-2xl font-bold text-black mb-1">Immersive Experience</h1>
       </div>
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-sm text-gray-400 z-10">
         Click anywhere to start the audio experience

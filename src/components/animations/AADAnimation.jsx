@@ -32,7 +32,7 @@ const AADAnimation = () => {
   }, []);
   
   return (
-    <div className="w-full h-40 flex flex-col items-center justify-center">
+    <div className="w-full h-38 mt-2 flex flex-col items-center justify-center">
       {/* Audio sources */}
       <div className="w-full flex justify-around mb-4">
         {audioSources.map((source, idx) => (

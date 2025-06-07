@@ -6,13 +6,29 @@ Source: https://sketchfab.com/3d-models/bird-orange-0d31748606c2499fb652c0c1052b
 Title: Bird Orange
 */
 
-import React, { useRef } from 'react'
+import React, { useRef, useEffect } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
+import PropTypes from 'prop-types'
 
 export function Bird(props) {
   const group = useRef()
   const { nodes, materials, animations } = useGLTF('/models/bird_orange.glb')
   const { actions } = useAnimations(animations, group)
+  
+  // Use the play animation prop if passed
+  useEffect(() => {
+    if (props.playAnimation && actions && Object.keys(actions).length > 0) {
+      // Get the first animation (or a specific one if you know its name)
+      const actionName = Object.keys(actions)[0];
+      const action = actions[actionName];
+      
+      if (action) {
+        action.reset().fadeIn(0.5).play();
+        return () => action.fadeOut(0.5);
+      }
+    }
+  }, [props.playAnimation, actions]);
+  
   return (
     <group ref={group} {...props} dispose={null}>
       <group name="Sketchfab_Scene">
@@ -47,6 +63,15 @@ export function Bird(props) {
       </group>
     </group>
   )
+}
+
+Bird.propTypes = {
+  playAnimation: PropTypes.bool,
+  scale: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.arrayOf(PropTypes.number)
+  ]),
+  position: PropTypes.arrayOf(PropTypes.number)
 }
 
 useGLTF.preload('/models/bird_orange.glb')

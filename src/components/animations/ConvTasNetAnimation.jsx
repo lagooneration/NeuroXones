@@ -106,7 +106,7 @@ const ConvTasNetAnimation = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.5 + waveIdx * 0.2, duration: 0.5 }}
           >
-            <div className="text-[8px] text-white opacity-50 absolute top-0 left-1">Stream {waveIdx + 1}</div>
+            <div className="text-[8px] text-white opacity-50 absolute top-2 left-1">Stream {waveIdx + 1}</div>
             <svg className="w-full h-full" viewBox="0 0 100 20">
               <motion.path
                 d={`M 0 10 ${wave.map((value, index) => 

@@ -196,7 +196,7 @@ const DPRNNAnimation = () => {
           className="mt-1 px-2 py-0.5 bg-green-900 rounded-sm text-[8px] text-green-300"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 4 }}
+          transition={{ delay: 3 }}
         >
           Computational Efficiency: 60% Power Savings
         </motion.div>

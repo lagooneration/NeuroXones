@@ -43,6 +43,9 @@
   *   Integrate the trained model with the headphone's audio processing unit.
  
 
+## Acknowledgement
+ Photo by cottonbro studio: [https://www.pexels.com/photo/woman-wearing-vr-goggles-4009626/](https://www.pexels.com/photo/woman-wearing-vr-goggles-4009626/)
+
  ## Contributing
  
 
