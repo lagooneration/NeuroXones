@@ -44,7 +44,12 @@
  
 
 ## Acknowledgement
- Photo by cottonbro studio: [https://www.pexels.com/photo/woman-wearing-vr-goggles-4009626/](https://www.pexels.com/photo/woman-wearing-vr-goggles-4009626/)
+ - Photo by cottonbro studio: [https://www.pexels.com/photo/woman-wearing-vr-goggles-4009626/](https://www.pexels.com/photo/woman-wearing-vr-goggles-4009626/)
+ - Stylized Hypercasual Lowpoly Park /w Props: [https://skfb.ly/oVnrr] by Bahri Sertkaya is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+ - Windmill ( Animated ): [https://skfb.ly/6rCxr] by Adrian Hage is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+- Le Tonneau Tavern: by Batuhan13 is licensed under Creative Commons Attribution-NonCommercial (http://creativecommons.org/licenses/by-nc/4.0/).
+- An Animated Cat: [https://skfb.ly/6YPwH] by Evil_Katz is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+- Sound Effect by [https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=47157] freesound_community from [https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=47157] Pixabay
 
  ## Contributing
  
