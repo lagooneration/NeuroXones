@@ -117,7 +117,6 @@ const DPRNNAnimation = () => {
       clearTimeout(timer3);
     };
   }, []);
-  
   return (
     <div className="w-full h-40 flex flex-col items-center justify-center">
       <div className="relative w-full h-32">

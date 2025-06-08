@@ -85,12 +85,10 @@ const ConvTasNetAnimation = () => {
           </motion.div>
         ))}
       </div>
-      
-      {/* Convolution operation indicator */}
+        {/* Convolution operation indicator */}
       <motion.div 
-        className="text-xs text-[#3a29ff] font-bold mb-3"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        className="text-xs text-[#3a29ff] font-bold mb-3 relative"
+        initial={{ opacity: 0 }}        animate={{ opacity: 1 }}
         transition={{ delay: 1, duration: 0.5 }}
       >
         ConvTasNet

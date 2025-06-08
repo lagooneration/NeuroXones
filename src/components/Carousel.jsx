@@ -1,7 +1,8 @@
-
 import { useEffect, useState, useRef, Suspense, useMemo } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import AlgorithmAnimation, { ANIMATION_DURATIONS } from "./animations/AlgorithmAnimation";
+import CountUp from "./CountUp";
+
 // replace icons with your own if needed
 import {
   FiCircle,
@@ -13,34 +14,28 @@ import {
 
 const DEFAULT_ITEMS = [
   {
-    title: "Text Animations",
-    description: "Cool text animations for your projects.",
     id: 1,
-    icon: <FiFileText className="h-[16px] w-[16px] text-white" />,
+    title: "Demcus",
+    description: "Demucs is a deep learning model for music source separation, designed to separate vocals and instruments from audio tracks.",
+    icon: <FiCircle />,
   },
   {
-    title: "Animations",
-    description: "Smooth animations for your projects.",
     id: 2,
-    icon: <FiCircle className="h-[16px] w-[16px] text-white" />,
+    title: "ConvTasNet",
+    description: "ConvTasNet is a convolutional time-domain audio separation network that uses deep learning to separate audio sources in the time domain.",
+    icon: <FiCode />,
   },
   {
-    title: "Components",
-    description: "Reusable components for your projects.",
     id: 3,
-    icon: <FiLayers className="h-[16px] w-[16px] text-white" />,
+    title: "AAD",
+    description: "AAD (Audio Attention Decoder) is a neural network model that uses attention mechanisms to separate audio sources based on their characteristics.",
+    icon: <FiFileText />,
   },
   {
-    title: "Backgrounds",
-    description: "Beautiful backgrounds and patterns for your projects.",
     id: 4,
-    icon: <FiLayout className="h-[16px] w-[16px] text-white" />,
-  },
-  {
-    title: "Common UI",
-    description: "Common UI components are coming soon!",
-    id: 5,
-    icon: <FiCode className="h-[16px] w-[16px] text-white" />,
+    title: "DPRNN",
+    description: "DPRNN (Dual Path Recurrent Neural Network) is a model that combines recurrent neural networks with dual-path processing to enhance audio source separation.",
+    icon: <FiLayers />,
   },
 ];
 
@@ -256,13 +251,24 @@ export default function Carousel({
               }}
               transition={effectiveTransition}
             >
-              <div className="p-5">
-                <div className="mb-3 font-black text-xl text-white">
-                  {item.title}
+              <div className="p-5 w-full">
+                <div className="mb-3 flex justify-between items-center">
+                  <div className="font-black text-xl text-white">
+                    {item.title} 
+                  </div>
+                  <div className="text-xl text-white">
+                    ⚠️<CountUp
+                        from={0}
+                        to={item.time}
+                        separator=","
+                        direction="up"
+                        duration={1}
+                        className="count-up-text"
+                      />
+                       s
+                  </div>
                 </div>
-                <p className="text-sm text-white leading-relaxed">
-                  {item.description}
-                </p>
+                
                 {item.id && ["Demcus", "ConvTasNet", "AAD", "DPRNN"].includes(item.title) && (
                   <div className="mt-4">
                     <Suspense fallback={<div className="w-full h-40 flex items-center justify-center text-white">Loading animation...</div>}>
@@ -273,6 +279,11 @@ export default function Carousel({
                     </Suspense>
                   </div>
                 )}
+                <div className="mt-4">
+                <p className="text-sm text-white text-center leading-relaxed">
+                  {item.description}
+                </p>
+                </div>
               </div>
             </motion.div>
           );

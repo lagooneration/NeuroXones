@@ -55,15 +55,13 @@ const DemcusAnimation = () => {
           ))}
         </div>
       </div>
-      
-      {/* Neural network processing representation */}
+        {/* Neural network processing representation */}
       <motion.div 
-        className="w-16 h-10 bg-gradient-to-r from-purple-700 to-indigo-900 rounded-md flex items-center justify-center mb-4"
+        className="w-16 h-10 bg-gradient-to-r from-purple-700 to-indigo-900 rounded-md flex items-center justify-center mb-4 relative"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.5 }}
-      >
-        <motion.div 
+      >        <motion.div 
           className="text-white text-xs font-bold"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -83,7 +81,7 @@ const DemcusAnimation = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1 + index * 0.2, duration: 0.5 }}
           >
-            <div className="text-[8px] text-white opacity-50 absolute top-0 left-1">Speaker {index + 1}</div>
+            <div className="text-[8px] text-white opacity-50 absolute top-3 left-1">Speaker {index + 1}</div>
             <svg className="w-full h-full" viewBox="0 0 100 20">
               <motion.path
                 d={generateWavePath(wave.amplitude, wave.frequency, wave.phase, 0.7)}

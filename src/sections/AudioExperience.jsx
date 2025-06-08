@@ -21,10 +21,9 @@ const AudioExperience = () => {
         </Link>
       </div>
       <div className="absolute top-12 left-1/2 -translate-x-1/2 text-center z-10">
-        <h1 className="text-2xl font-bold text-black mb-1">Immersive Experience</h1>
       </div>
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-sm text-gray-400 z-10">
-        Click anywhere to start the audio experience
+        Move cursor to focus on sound of interest
       </div>
       <div className="h-full">
         <ParkAudioScene />

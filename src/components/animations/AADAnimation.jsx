@@ -155,11 +155,9 @@ const AADAnimation = () => {
           </motion.svg>
         )}
       </div>
-      
-      <motion.div 
-        className="text-xs text-white font-bold mt-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        <motion.div 
+        className="text-xs text-white font-bold mt-2 relative"
+        initial={{ opacity: 0 }}        animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
       >
         Auditory Attention Detection

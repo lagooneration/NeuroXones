@@ -123,7 +123,7 @@ const Hero = () => {
                 animate="visible"
                 className="text-white-50 text-sm sm:text-base md:text-lg lg:text-xl relative z-10 pointer-events-none"
               >
-                Integrated Brain Computer Interface (BCI).
+                (BCI) Brain Computer Interface.
               </motion.p>
               
               <motion.div 

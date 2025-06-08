@@ -7,22 +7,26 @@ const Algo = () => {
     const algorithmItems = [
         {
             title: "Demcus",
-            description: "Deep End-to-end Multi-Channel Speech Separation algorithm that isolates individual speakers from overlapping audio.",
+            description: "Speech Separation algorithm that isolates individual speakers",
+            time: "50 seconds",
             id: 1,
         },
         {
             title: "ConvTasNet",
-            description: "Convolutional Time-domain Audio Separation Network that uses advanced neural processing to separate audio streams.",
+            description: "Time-domain Audio Separation Network to separate audio streams",
+            time: "6 seconds",
             id: 2,
         },
         {
             title: "AAD",
-            description: "Auditory Attention Detection precisely tracks neural activity to identify which audio stream a listener is focusing on.",
+            description: "Auditory Attention Detection precisely tracks neural activity to track focus",
+            time: "12 seconds",
             id: 3,
         },
         {
             title: "DPRNN",
-            description: "Dual-Path Recurrent Neural Network offers unprecedented precision in audio stream separation and attention tracking.",
+            description: "Dual-Path Recurrent Neural Network offers unprecedented precision in audio stream separation",
+            time: "8 seconds",
             id: 4,
         }
     ];
@@ -57,23 +61,12 @@ const Algo = () => {
         <div className="c-space max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="py-16">
                 <h2 className="text-4xl font-bold text-center mt-8 text-white">Core Algorithms</h2>
-                <div className="flex flex-col md:flex-row items-center justify-center gap-8 mt-12">
-                    <div style={{ width: '400px', height: '400px', position: 'relative' }}>                        
-                        <Carousel
-                            items={algorithmItems}
-                            baseWidth={400}
-                            autoplay={true}
-                            autoplayDelay={5000}
-                            pauseOnHover={true}
-                            loop={true}
-                            round={false}
-                            onSlideChange={handleAlgorithmChange}
-                        />
-                    </div>
-                      <div className="max-w-lg bg-[#0a0b1a] border border-[#1a1a2e] mt-10 rounded-xl p-8 shadow-xl">
-                        {/* <h3 className="text-2xl font-bold mt-2 text-white">
+                <div className="flex flex-col md:flex-row items-start justify-center gap-8 mt-24">
+                    
+                      <div className="max-w-lg bg-[#0a0b1a] border border-[#1a1a2e] rounded-xl p-8 shadow-xl">
+                        <h3 className="text-2xl font-bold mt-2 text-white">
                             {algorithmDetails[currentAlgorithm].title}
-                        </h3> */}
+                        </h3>
                         <p className="text-gray-300 mb-6 leading-relaxed">
                             {algorithmDetails[currentAlgorithm].description}
                         </p>
@@ -87,6 +80,19 @@ const Algo = () => {
                                 </li>
                             ))}
                         </ul>
+                    </div>
+
+                    <div style={{ width: '400px', height: '400px', position: 'relative' }}>                        
+                        <Carousel
+                            items={algorithmItems}
+                            baseWidth={400}
+                            autoplay={true}
+                            autoplayDelay={5000}
+                            pauseOnHover={true}
+                            loop={true}
+                            round={false}
+                            onSlideChange={handleAlgorithmChange}
+                        />
                     </div>
                     
                 </div>
