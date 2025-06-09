@@ -2,12 +2,13 @@ import { OrbitControls, useProgress } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useMediaQuery } from "react-responsive";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
-import { Suspense } from "react";
+import { Suspense, useEffect, useCallback } from "react";
 import { Grid } from 'ldrs/react';
 import 'ldrs/react/Grid.css';
 import { Brain } from "../../models/Brain";
 import { Hp } from "../Hp";
 import HeroLights from "./HeroLights";
+import { useSpring, animated } from '@react-spring/three';
 
 
 function Loader() {
@@ -32,6 +33,34 @@ function Loader() {
 const Scene = () => {
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   const isSmallMobile = useMediaQuery({ query: "(max-width: 480px)" });
+  const { progress } = useProgress();
+
+  const [brainSpring, setBrainSpring] = useSpring(() => ({
+    position: [0, 20, 0],
+    config: { mass: 1, tension: 280, friction: 60 }
+  }));
+
+  const [hpSpring, setHpSpring] = useSpring(() => ({
+    position: [0, 20, 0],
+    config: { mass: 1, tension: 280, friction: 60 }
+  }));
+
+  const animateModels = useCallback(() => {
+    setBrainSpring({
+      position: isSmallMobile ? [0, -2.0, 0] : isMobile ? [0, -1.8, 0] : [0, -1.2, 0],
+      delay: 300
+    });
+    setHpSpring({
+      position: isSmallMobile ? [0, -4.5, 0] : isMobile ? [0, -4.2, 0] : [0, -3.2, 0],
+      delay: 500
+    });
+  }, [setBrainSpring, setHpSpring, isMobile, isSmallMobile]);
+
+  useEffect(() => {
+    if (progress === 100) {
+      animateModels();
+    }
+  }, [progress, animateModels]);
 
   return (
     <>
@@ -48,22 +77,22 @@ const Scene = () => {
       <HeroLights />
       
       {/* Brain model group */}
-      <group
+      <animated.group
         scale={isSmallMobile ? [21, 21, 21] : isMobile ? [21, 21, 21] : [15, 15, 15]}
-        position={isSmallMobile ? [0, -2.0, 0] : isMobile ? [0, -1.8, 0] : [0, -1.2, 0]}
+        position={brainSpring.position}
         rotation={[0, -Math.PI * 1.85, 0]}
       >
         <Brain />
-      </group>
+      </animated.group>
 
-      {/* HP model group - positioned relative to brain */}
-      <group
+      {/* HP model group */}
+      <animated.group
         scale={isSmallMobile ? [27, 27, 27] : isMobile ? [27, 27, 27] : [20, 20, 20]}
-        position={isSmallMobile ? [0, -4.5, 0] : isMobile ? [0, -4.2, 0] : [0, -3.2, 0]}
+        position={hpSpring.position}
         rotation={[0, -Math.PI * 1.85, 0]}
       >
         <Hp />
-      </group>
+      </animated.group>
 
       <EffectComposer>
         <Bloom luminanceThreshold={.9} luminanceSmoothing={0.9} height={500} />

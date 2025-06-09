@@ -1,6 +1,7 @@
 import { twMerge } from "tailwind-merge";
 import { useRef, useState, useEffect } from "react";
 import { Canvas, useThree, useFrame, extend } from "@react-three/fiber";
+import PropTypes from 'prop-types';
 import * as THREE from "three";
 
 // Create a shader material for the neural network effect
@@ -198,13 +199,17 @@ function NeuralNetwork() {
 // Main component exported to be used in the app
 export const Particles = ({
   className = "",
+  refresh, // Destructure refresh prop but don't use it
   ...props
 }) => {
+  // Remove refresh from props to prevent it from being passed to the DOM
+  const { refresh: _, ...restProps } = props;
+  
   return (
     <div
       className={twMerge("pointer-events-none", className)}
       aria-hidden="true"
-      {...props}
+      {...restProps}
       style={{ width: '100%', height: '100%', ...props.style }}
     >
       <Canvas
@@ -219,4 +224,13 @@ export const Particles = ({
       </Canvas>
     </div>
   );
+};
+
+Particles.propTypes = {
+  className: PropTypes.string,
+  refresh: PropTypes.bool,
+  style: PropTypes.object,
+  quantity: PropTypes.number,
+  ease: PropTypes.number,
+  color: PropTypes.string
 };
