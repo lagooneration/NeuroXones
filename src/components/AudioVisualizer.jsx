@@ -9,34 +9,33 @@ const AudioVisualizer = ({ activeAudioSource, audioRefs }) => {
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
   const analyzerRef = useRef(null);
+
   useEffect(() => {
     // Skip if no audio source is active or no canvas
-    if (!activeAudioSource || !canvasRef.current || !audioRefs.current) return;
-    
-    // Get the current audio element based on the active source
-    let audioElement;
-    switch (activeAudioSource) {
-      case 'Birds':
-        audioElement = audioRefs.current.birds;
-        break;
-      case 'Cat':
-        audioElement = audioRefs.current.cat;
-        break;
-      case 'Sign':
-        audioElement = audioRefs.current.sign;
-        break;
-      default:
-        return; // Exit if no matching audio source
-    }
-    
-    // Use the analyzer that's already attached to the audio element
-    if (audioElement && audioElement.analyzer) {
-      // Store the analyzer reference
-      analyzerRef.current = audioElement.analyzer;
-    } else {
-      console.warn('Audio element does not have an analyzer node attached');
+    if (!activeAudioSource || !canvasRef.current || !audioRefs) {
+      console.log('Skipping visualization:', { activeAudioSource, hasCanvas: !!canvasRef.current, hasAudioRefs: !!audioRefs });
       return;
     }
+      // Get the current audio element based on the active source
+    let audioElement;
+    const source = activeAudioSource.toLowerCase();
+    if (audioRefs[source]) {
+      audioElement = audioRefs[source];
+      console.log(`Found audio element for ${source}:`, !!audioElement);
+    } else {
+      console.warn(`No audio element found for source: ${source}`);
+      return;
+    }
+    
+    if (!audioElement?.analyzer) {
+      console.warn('Audio element does not have an analyzer node:', activeAudioSource);
+      return;
+    }
+    
+    console.log(`Analyzer node found for ${activeAudioSource}:`, !!audioElement.analyzer);
+    
+    // Get the analyzer from the audio element    // Store the analyzer reference
+    analyzerRef.current = audioElement.analyzer;
     
     // Canvas setup
     const canvas = canvasRef.current;
@@ -54,11 +53,15 @@ const AudioVisualizer = ({ activeAudioSource, audioRefs }) => {
     // Animation function to draw the audio visualization
     const draw = () => {
       if (!analyzerRef.current) return;
-      
-      // Get frequency data
+          // Get frequency data
       const bufferLength = analyzerRef.current.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
-      analyzerRef.current.getByteFrequencyData(dataArray);
+      try {
+        analyzerRef.current.getByteFrequencyData(dataArray);
+      } catch (error) {
+        console.error('Error getting frequency data:', error);
+        return;
+      }
       
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -66,17 +69,16 @@ const AudioVisualizer = ({ activeAudioSource, audioRefs }) => {
       // Draw visualization bars
       const barWidth = (canvas.width / bufferLength) * 2.5;
       let x = 0;
-      
-      // Choose color based on active source
+        // Choose color based on active source
       let barColor;
-      switch (activeAudioSource) {
-        case 'Birds':
+      switch (activeAudioSource.toLowerCase()) {
+        case 'birds':
           barColor = 'rgba(255, 212, 59, 0.8)'; // Yellow for birds
           break;
-        case 'Cat':
+        case 'cat':
           barColor = 'rgba(255, 107, 107, 0.8)'; // Red for cat
           break;
-        case 'Sign':
+        case 'sign':
           barColor = 'rgba(77, 171, 247, 0.8)'; // Blue for sign
           break;
         default:

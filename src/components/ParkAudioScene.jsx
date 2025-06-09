@@ -1,215 +1,319 @@
-import React, { useRef, useState, useEffect, Suspense, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { 
-  OrbitControls,
+import React, { useRef, useState, useEffect, Suspense, memo, useCallback } from 'react';
+import PropTypes from 'prop-types';
+import { Canvas, extend, useThree } from '@react-three/fiber';
+import {
   Environment,
+  OrbitControls,
   AccumulativeShadows,
   RandomizedLight,
+  useGLTF,
   useAnimations,
-  useGLTF
+  Preload
 } from '@react-three/drei';
-import { 
-  EffectComposer,
-  Bloom,
-  ChromaticAberration,
-  BrightnessContrast 
-} from '@react-three/postprocessing';
+import * as THREE from 'three';
 import { Bird } from './models/sim_models/Bird';
 import { Cat } from './models/sim_models/Cat';
 import { Sign } from './models/sim_models/Sign';
-import PropTypes from 'prop-types';
 import AudioVisualizer from './AudioVisualizer';
 
-const AudioController = ({ onPositionChange, onBirdHover, onCatHover, onSignHover }) => {
+// Extend THREE elements for JSX use
+extend(THREE);
+
+const AudioController = memo(React.forwardRef((props, ref) => {
+  const { onPositionChange, onBirdHover, onCatHover, onSignHover } = props;
   const trackpadRef = useRef(null);
   const birdIconRef = useRef(null);
   const catIconRef = useRef(null);
   const signIconRef = useRef(null);
+  const audioContextRef = useRef(null);
   const audioRefs = useRef({
     sign: null,
     birds: null,
     cat: null,
     traffic: null
   });
-  
+
+  // Expose audioRefs to parent via ref
+  useEffect(() => {
+    if (ref) {
+      ref.current = audioRefs;
+    }
+  }, [ref]);
+
   // Track hover states internally to use in audio adjustment
   const isBirdHovered = useRef(false);
   const isCatHovered = useRef(false);
   const isSignHovered = useRef(false);
   const isTrafficHovered = useRef(false);
 
-  // Expose audio references for the visualizer
-  useEffect(() => {
-    // Share audioRefs with parent component
-    if (typeof window !== 'undefined') {
-      window.audioRefsForVisualizer = audioRefs;
+  // Track if audio is playing
+  const isPlayingRef = useRef(false);
+  // Create audio context lazily on first user interaction
+  const initializeAudioContext = useCallback(() => {
+    if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      audioContextRef.current = new AudioContext();
+    } else if (audioContextRef.current.state === 'suspended') {
+      audioContextRef.current.resume();
     }
-    
-    return () => {
-      if (typeof window !== 'undefined') {
-        delete window.audioRefsForVisualizer;
-      }
-    };
+    return audioContextRef.current;
   }, []);
-  useEffect(() => {
-    // Create an audio context for more advanced audio control
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    const audioContext = new AudioContext();
-      // Initialize audio elements with panning capability
-    const createAudioWithPanning = (url) => {
-      const audio = new Audio(url);
-      audio.loop = true;
-      audio.volume = 0;
-      
-      // Create audio nodes for panning
-      const source = audioContext.createMediaElementSource(audio);
-      const gainNode = audioContext.createGain();
-      const panNode = audioContext.createStereoPanner();
-      const analyzerNode = audioContext.createAnalyser();
-      analyzerNode.fftSize = 128;
-      
-      // Connect the audio pipeline
-      source.connect(panNode);
-      panNode.connect(gainNode);
-      gainNode.connect(analyzerNode);
-      analyzerNode.connect(audioContext.destination);
-      
-      // Store control nodes for later use
-      audio.pan = panNode;
-      audio.gain = gainNode;
-      audio.analyzer = analyzerNode;
-      
-      return audio;
-    };
 
-    const audios = {
-      sign: createAudioWithPanning('/audio/sign.mp3'),
-      birds: createAudioWithPanning('/audio/birds.mp3'),
-      cat: createAudioWithPanning('/audio/cat.mp3'),
-      traffic: createAudioWithPanning('/audio/traffic.mp3')
-    };
+  // Start audio playback
+  const startAudio = useCallback(() => {
+    const audioContext = audioContextRef.current;
+    if (!audioContext) return;
 
-    audioRefs.current = audios;
+    // Make sure context is resumed
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
 
-    const initAudio = async () => {
-      try {
-        // Resume audio context on user interaction
-        if (audioContext.state === 'suspended') {
-          await audioContext.resume();
-        }
-        
-        await Promise.all(Object.values(audios).map(audio => {
-          const playPromise = audio.play();
-          if (playPromise !== undefined) {
-            return playPromise.catch(err => {
-              console.warn('Audio play was prevented:', err);
-            });
+    if (!isPlayingRef.current && audioRefs.current) {
+      console.log('Starting audio playback...');
+      Object.entries(audioRefs.current).forEach(([key, audio]) => {
+        if (audio?.source && audio.source.buffer) {
+          try {
+            // Set initial gain to avoid sudden loud sounds
+            audio.gainNode.gain.value = 0.5;
+            audio.source.start(0);
+            console.log(`Started ${key} audio source`);
+          } catch (error) {
+            if (!error.message.includes('start')) {
+              console.error(`Error starting ${key} audio:`, error);
+            }
           }
-          return Promise.resolve();
-        }));
-        
-        // Set initial panning positions based on their locations
-        audios.birds.pan.value = 0.4;  // Bird on the right
-        audios.cat.pan.value = -0.4;   // Cat on the left
-        audios.sign.pan.value = 0;     // Sign in the center
-      } catch (err) {
-        console.error('Failed to play audio:', err);
-      }
-    };
-
-    // Initialize on user interaction
-    const handleInteraction = () => {
-      initAudio();
-      document.removeEventListener('click', handleInteraction);
-    };
-    document.addEventListener('click', handleInteraction);
-
-    return () => {
-      Object.values(audios).forEach(audio => audio.pause());
-      document.removeEventListener('click', handleInteraction);
-      // Close audio context on cleanup
-      if (audioContext.state !== 'closed') {
-        audioContext.close().catch(err => console.error('Error closing audio context:', err));
-      }
-    };
+        } else {
+          console.warn(`Audio source or buffer not ready for ${key}`);
+        }
+      });
+      isPlayingRef.current = true;
+    }
   }, []);
-  const handleTrackpadMove = (e) => {
+
+  // Cleanup function for audio resources
+  useEffect(() => {
+    return () => {
+      // Cleanup audio context and resources
+      if (isPlayingRef.current) {
+        Object.values(audioRefs.current).forEach(audio => {
+          if (audio?.source) {
+            try {
+              audio.source.stop();
+              audio.source.disconnect();
+            } catch (error) {
+              if (!error.message.includes('stop')) {
+                console.error('Error stopping audio:', error);
+              }
+            }
+          }          if (audio?.analyzer) {
+            audio.analyzer.disconnect();
+          }
+          if (audio?.panner) {
+            audio.panner.disconnect();
+          }
+          if (audio?.gainNode) {
+            audio.gainNode.disconnect();
+          }
+        });
+      }
+      if (audioContextRef.current?.state !== 'closed') {
+        audioContextRef.current?.close();
+      }
+    };
+  }, []);  // Create audio analyzer nodes for visualization
+  const createAnalyzer = useCallback(() => {
+    const audioContext = audioContextRef.current;
+    if (!audioContext) {
+      console.warn('No audio context available for analyzer creation');
+      return null;
+    }
+
+    const analyzer = audioContext.createAnalyser();
+    analyzer.fftSize = 2048;
+    analyzer.smoothingTimeConstant = 0.8;
+    analyzer.minDecibels = -90;
+    analyzer.maxDecibels = -10;
+    return analyzer;
+  }, []);// Setup analyzers for each audio source
+  useEffect(() => {
+    if (audioContextRef.current && audioRefs.current) {
+      Object.entries(audioRefs.current).forEach(([key, audio]) => {
+        if (audio?.gainNode && !audio.analyzer) {
+          const analyzer = createAnalyzer();
+          if (analyzer) {
+            audio.gainNode.connect(analyzer);
+            audio.analyzer = analyzer;
+            console.log(`Created analyzer for ${key} audio source`);
+          }
+        }
+      });
+    }
+  }, [createAnalyzer]);
+
+  // Initialize audio with error handling
+  useEffect(() => {
+    const loadAudio = async () => {
+      try {
+        const audioContext = initializeAudioContext();
+        
+        // Create audio with panning capability
+        const createAudioWithPanning = async (url) => {
+          console.log(`Loading audio from ${url}`);
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch audio file ${url}: ${response.status} ${response.statusText}`);
+          }
+          const arrayBuffer = await response.arrayBuffer();
+          const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+          
+          const source = audioContext.createBufferSource();
+          const panner = audioContext.createPanner();
+          const gainNode = audioContext.createGain();
+          
+          source.buffer = audioBuffer;
+          source.loop = true;
+          
+          // Configure panner for better spatial audio
+          panner.panningModel = 'HRTF';
+          panner.distanceModel = 'inverse';
+          panner.refDistance = 1;
+          panner.maxDistance = 10000;
+          panner.rolloffFactor = 1;
+          panner.coneInnerAngle = 360;
+          panner.coneOuterAngle = 0;
+          panner.coneOuterGain = 0;
+          
+          // Set initial gain to prevent sudden loud sounds
+          gainNode.gain.value = 0.5;
+            source.connect(panner);
+          panner.connect(gainNode);
+          
+          // Create analyzer for this source
+          const analyzer = createAnalyzer();
+          if (analyzer) {
+            gainNode.connect(analyzer);
+            analyzer.connect(audioContext.destination);
+          } else {
+            gainNode.connect(audioContext.destination);
+          }
+          
+          return { source, panner, gainNode, analyzer, isStarted: false };
+        };
+
+        const audioUrls = {
+          sign: '/audio/sign.mp3',
+          birds: '/audio/birds.mp3',
+          cat: '/audio/cat.mp3',
+          traffic: '/audio/traffic.mp3'
+        };
+
+        // Load all audio files
+        const loadedAudios = await Promise.all(
+          Object.entries(audioUrls).map(async ([key, url]) => {
+            try {
+              const audio = await createAudioWithPanning(url);
+              console.log(`Successfully loaded audio for ${key}`);
+              return [key, audio];
+            } catch (error) {
+              console.error(`Failed to load audio for ${key}:`, error);
+              return [key, null];
+            }
+          })
+        );
+
+        // Update refs with loaded audio
+        audioRefs.current = Object.fromEntries(loadedAudios.filter(([_, audio]) => audio !== null));
+        
+        // Add click/touch listeners for first interaction
+        const handleFirstInteraction = () => {
+          console.log('First user interaction detected');
+          startAudio();
+          document.removeEventListener('click', handleFirstInteraction);
+          document.removeEventListener('touchstart', handleFirstInteraction);
+        };
+        
+        document.addEventListener('click', handleFirstInteraction);
+        document.addEventListener('touchstart', handleFirstInteraction);
+
+      } catch (error) {
+        console.error('Failed to initialize audio:', error);
+      }
+    };    loadAudio();
+  }, [initializeAudioContext, startAudio, createAnalyzer]);
+
+  // Memoize handlers
+  const handleTrackpadMove = useCallback((e) => {
     if (!trackpadRef.current) return;
 
     const rect = trackpadRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
 
-    // Calculate distances from points of interest
-    const centerDist = Math.sqrt(Math.pow(x - 0.5, 2) + Math.pow(y - 0.5, 2));
-    const birdDist = Math.sqrt(Math.pow(x - 0.7, 2) + Math.pow(y - 0.3, 2));
-    const catDist = Math.sqrt(Math.pow(x - 0.3, 2) + Math.pow(y - 0.3, 2));
-    
-    // Calculate distance from edge - the closer to any edge, the louder the traffic
-    const trafficDist = Math.min(x, 1 - x, y, 1 - y);
+    // Calculate distances to each audio source
+    const signPos = { x: 0.5, y: 0.5 }; // center
+    const birdPos = { x: 0.7, y: 0.3 }; // top-right
+    const catPos = { x: 0.3, y: 0.3 };  // top-left
 
-    // Update audio volumes
+    // Calculate distances (normalized 0-1)
+    const maxDist = Math.sqrt(0.5);
+    const signDist = Math.hypot(x - signPos.x, y - signPos.y);
+    const birdDist = Math.hypot(x - birdPos.x, y - birdPos.y);
+    const catDist = Math.hypot(x - catPos.x, y - catPos.y);
+
+    // Convert distance to volume (closer = louder)
+    const signVolume = Math.max(0, 1 - (signDist / maxDist));
+    const birdVolume = Math.max(0, 1 - (birdDist / maxDist));
+    const catVolume = Math.max(0, 1 - (catDist / maxDist));
+
+    // Apply hover boost and smooth transitions
+    const smoothFactor = 0.1;
+    const hoverBoostFactor = 1.5;
+
     if (audioRefs.current.sign) {
-      // Base volumes - adjusted for better spatial audio experience
-      let signVolume = Math.max(0, 1 - centerDist * 1.2);
-      let birdVolume = Math.max(0, 1 - birdDist * 1.2);
-      let catVolume = Math.max(0, 1 - catDist * 1.2);
-      let trafficVolume = Math.max(0, 1 - trafficDist * 2.5); // Traffic gets louder at edges
-      
-      // Enhanced selective hearing effect
-      if (isBirdHovered.current) {
-        birdVolume = Math.min(1, birdVolume * 2.5); // Significantly boost focused audio
-        signVolume *= 0.3; // Further reduce other sounds
-        catVolume *= 0.3;
-        trafficVolume *= 0.2; // Reduce traffic noise even more
-        
-        // Add dynamic panning based on cursor position
-        if (audioRefs.current.birds.pan) {
-          audioRefs.current.birds.pan.value = Math.min(1, Math.max(-1, (x - 0.7) * 2));
+      // Apply hover boost if element is hovered
+      const boostedSignVolume = isSignHovered.current ? signVolume * hoverBoostFactor : signVolume;
+      const boostedBirdVolume = isBirdHovered.current ? birdVolume * hoverBoostFactor : birdVolume;
+      const boostedCatVolume = isCatHovered.current ? catVolume * hoverBoostFactor : catVolume;
+
+      // Update gain nodes with smooth transitions
+      audioRefs.current.sign.gainNode.gain.value = audioRefs.current.sign.gainNode.gain.value * (1 - smoothFactor) + boostedSignVolume * smoothFactor;
+      audioRefs.current.birds.gainNode.gain.value = audioRefs.current.birds.gainNode.gain.value * (1 - smoothFactor) + boostedBirdVolume * smoothFactor;
+      audioRefs.current.cat.gainNode.gain.value = audioRefs.current.cat.gainNode.gain.value * (1 - smoothFactor) + boostedCatVolume * smoothFactor;
+
+      // Update panner positions
+      audioRefs.current.sign.panner.setPosition((x - 0.5) * 2, (y - 0.5) * 2, -0.5);
+      audioRefs.current.birds.panner.setPosition((x - birdPos.x) * 2, (y - birdPos.y) * 2, -0.5);
+      audioRefs.current.cat.panner.setPosition((x - catPos.x) * 2, (y - catPos.y) * 2, -0.5);
+
+      // Handle audio context state
+      if (!isPlayingRef.current) {
+        // If context is closed, reinitialize it
+        if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+          initializeAudioContext();
         }
-      } else if (isCatHovered.current) {
-        catVolume = Math.min(1, catVolume * 2.5);
-        signVolume *= 0.3;
-        birdVolume *= 0.3;
-        trafficVolume *= 0.2;
-        
-        if (audioRefs.current.cat.pan) {
-          audioRefs.current.cat.pan.value = Math.min(1, Math.max(-1, (x - 0.3) * 2));
-        }
-      } else if (isSignHovered.current) {
-        signVolume = Math.min(1, signVolume * 2.5);
-        birdVolume *= 0.3;
-        catVolume *= 0.3;
-        trafficVolume *= 0.2;
-        
-        if (audioRefs.current.sign.pan) {
-          audioRefs.current.sign.pan.value = Math.min(1, Math.max(-1, (x - 0.5) * 2));
-        }
-      } else if (isTrafficHovered.current) {
-        trafficVolume = Math.min(1, trafficVolume * 2.5);
-        signVolume *= 0.3;
-        birdVolume *= 0.3;
-        catVolume *= 0.3;
-      } else {
-        // Apply natural volume balancing when nothing is hovered
-        // Boost the closest sound source slightly
-        const minDist = Math.min(centerDist, birdDist, catDist, trafficDist);
-        if (minDist === centerDist) signVolume = Math.min(1, signVolume * 1.3);
-        if (minDist === birdDist) birdVolume = Math.min(1, birdVolume * 1.3);
-        if (minDist === catDist) catVolume = Math.min(1, catVolume * 1.3);
-        if (minDist === trafficDist) trafficVolume = Math.min(1, trafficVolume * 1.3);
+        // Try to start audio
+        startAudio();
+      } else if (audioContextRef.current?.state === 'suspended') {
+        audioContextRef.current.resume().catch(error => {
+          console.error('Error resuming audio context:', error);
+          if (error.message.includes('closed')) {
+            initializeAudioContext();
+            startAudio();
+          }
+        });
       }
-      
-      // Apply smooth volume transitions
-      const smoothFactor = 0.1; // Lower value = smoother but slower transitions
-      audioRefs.current.sign.volume = audioRefs.current.sign.volume * (1 - smoothFactor) + signVolume * smoothFactor;
-      audioRefs.current.birds.volume = audioRefs.current.birds.volume * (1 - smoothFactor) + birdVolume * smoothFactor;
-      audioRefs.current.cat.volume = audioRefs.current.cat.volume * (1 - smoothFactor) + catVolume * smoothFactor;
-      audioRefs.current.traffic.volume = audioRefs.current.traffic.volume * (1 - smoothFactor) + trafficVolume * smoothFactor;
     }
 
+    // Ensure gain values are within valid range
+    Object.values(audioRefs.current).forEach(audio => {
+      if (audio?.gainNode && audio.gainNode.gain.value > 1) {
+        audio.gainNode.gain.value = 1;
+      }
+    });
+
     onPositionChange?.({ x: x * 2 - 1, y: -(y * 2 - 1) });
-  };return (    <div className="relative h-full w-full p-2 sm:p-4 md:p-6 lg:p-8">
+  }, [onPositionChange, startAudio, initializeAudioContext]);return (    <div className="relative h-full w-full p-2 sm:p-4 md:p-6 lg:p-8">
       <div className="w-full h-full construction-border">
         <div 
           ref={trackpadRef}
@@ -289,257 +393,276 @@ const AudioController = ({ onPositionChange, onBirdHover, onCatHover, onSignHove
       </div>
     </div>
   );
-};
+}));
 
 AudioController.propTypes = {
   onPositionChange: PropTypes.func,
   onBirdHover: PropTypes.func,
   onCatHover: PropTypes.func,
-  onSignHover: PropTypes.func
+  onSignHover: PropTypes.func,
+  ref: PropTypes.shape({
+    current: PropTypes.object
+  })
 };
 
 // Component code for Fountain and Traffic has been removed and replaced with Cat and Sign models
 
-const BirdAnimation = ({ isBirdHovered }) => {
-  const birdRef = useRef();
+const Scene = memo(({ isBirdHovered, isCatHovered, isSignHovered }) => {
+  const { camera, gl } = useThree();
 
-  // Position is now fixed and doesn't change when hovered
-  // Only the Bird component's animation plays based on hover state
-  return (
-    <group ref={birdRef} position={[5.8, -0.4, 7.2]} rotation={[0, Math.PI / 6, 0]}>
-      <Bird scale={0.32} playAnimation={isBirdHovered} />
-    </group>
-  );
-};
-
-BirdAnimation.propTypes = {
-  isBirdHovered: PropTypes.bool
-};
-
-const CatAnimation = ({ isCatHovered }) => {
-  const catRef = useRef();
-  const { animations } = useGLTF('/models/cat.glb');
-  const { actions } = useAnimations(animations, catRef);
-  
   useEffect(() => {
-    // Debug the available animations
-    if (actions && Object.keys(actions).length > 0) {
-      console.log('Available cat animations:', Object.keys(actions));
+    if (camera) {
+      camera.position.set(10, 2, 10);
+      camera.fov = 60;
+      camera.updateProjectionMatrix();
     }
-    
-    if (isCatHovered) {
-      // Try to play animation - if Animation doesn't exist, try the first available animation
-      if (actions.Animation) {
-        actions.Animation.reset().fadeIn(0.5).play();
-      } else if (Object.keys(actions).length > 0) {
-        const animName = Object.keys(actions)[0];
-        actions[animName].reset().fadeIn(0.5).play();
-      }
-    } else {
-      // Stop animation when not hovered
-      if (actions.Animation) {
-        actions.Animation.fadeOut(0.5);
-      } else if (Object.keys(actions).length > 0) {
-        const animName = Object.keys(actions)[0];
-        actions[animName].fadeOut(0.5);
-      }
+    if (gl) {
+      gl.shadowMap.enabled = true;
+      gl.shadowMap.type = THREE.PCFSoftShadowMap;
     }
-  }, [isCatHovered, actions]);
+  }, [camera, gl]);
 
-  return (
-    <group ref={catRef} position={[2.8, -0.9, 3.2]} rotation={[0, -Math.PI / 2, 0]} scale={0.08}>
-      <Cat />
-    </group>
-  );
-};
-
-CatAnimation.propTypes = {
-  isCatHovered: PropTypes.bool
-};
-
-const SignAnimation = ({ isSignHovered }) => {
-  const signRef = useRef();
-  const { animations } = useGLTF('/models/sign.glb');
-  const { actions } = useAnimations(animations, signRef);
-  
-  useEffect(() => {
-    // Debug the available animations
-    if (actions && Object.keys(actions).length > 0) {
-      console.log('Available sign animations:', Object.keys(actions));
-    }
-    
-    // Sign animations may have different names, adjust as needed
-    const animationName = Object.keys(actions)[0]; // Get first animation
-    
-    if (isSignHovered) {
-      // Enhance animation or lighting when hovered
-      if (actions[animationName]) {
-        actions[animationName].reset().fadeIn(0.5).play();
-      }
-    } else {
-      // Return to normal state
-      if (actions[animationName]) {
-        actions[animationName].fadeOut(0.5);
-      }
-    }
-  }, [isSignHovered, actions]);
-
-  return (
-    <group ref={signRef} position={[2.9, 2.8, 0]} rotation={[0, Math.PI / 3, 0]} scale={0.8}>
-      <Sign />
-    </group>
-  );
-};
-
-SignAnimation.propTypes = {
-  isSignHovered: PropTypes.bool
-};
-
-const Park3D = ({ isBirdHovered, isCatHovered, isSignHovered }) => {
   return (
     <>
-      <group>
-        {/* <SimScene 
-          scale={[1, 1, 1]}
-          position={[0, 0, 0]} 
-          castShadow 
-          receiveShadow
-        /> */}
-        <BirdAnimation 
-          isBirdHovered={isBirdHovered} 
-        />
-        <CatAnimation 
-          isCatHovered={isCatHovered}
-        />
-        
-        {/* Sign in the center */}
-        <SignAnimation 
-          isSignHovered={isSignHovered}
-        />
-          
-        <mesh 
-          position={[0, -1, 0]} 
-          rotation={[-Math.PI / 2, 0, 0]}
-          receiveShadow
-        >
-          {/* <planeGeometry args={[100, 100]} /> */}
-          <meshStandardMaterial 
-            color="#356c4d"
-            roughness={0.9}
-            metalness={0.05}
-            envMapIntensity={0.3}
-          />
-        </mesh>        
-        <AccumulativeShadows 
-          temporal 
-          frames={100} 
-          color="#2a2a2a" 
-          colorBlend={0.7} 
-          toneMapped={true}
-          alphaTest={0.75}
-          opacity={0.8}
-          scale={100}
-          position={[0, -0.99, 0]}
-        >
-          <RandomizedLight 
-            amount={8}
-            radius={6}
-            ambient={0.6}
-            intensity={1.2}
-            position={[3, 5, 3]}
-            bias={0.001}
-            size={10}
-          />
-          <RandomizedLight 
-            amount={4}
-            radius={4}
-            ambient={0.4}
-            intensity={0.8}
-            position={[-5, 7, -5]}
-            bias={0.001}
-            size={8}
-            color="#b3d9ff"
-          />
-        </AccumulativeShadows>
-      </group>
-    </>
-  );
-};
-
-Park3D.propTypes = {
-  isBirdHovered: PropTypes.bool,
-  isCatHovered: PropTypes.bool,
-  isSignHovered: PropTypes.bool
-};
-
-const Scene = ({ trackpadPosition, isBirdHovered, isCatHovered, isSignHovered }) => {
-  // We're keeping trackpadPosition in the props even though it's not directly used by Park3D
-  // because it could be needed for future enhancements or animations
-  return (
-    <Canvas 
-      camera={{ position: [10, 2, 10], fov: 60 }}
-      shadows
-    >
-      <color attach="background" args={["#9fbcea"]} />
-        <Suspense fallback={null}>
+      <color attach="background" args={['#9fbcea']} />
+      <fog attach="fog" args={['#9fbcea', 10, 50]} />
+      
+      <Suspense fallback={null}>
         <Environment 
           files="/assets/env/anime_art_style_japan_streets_with_cherry_blossom_.jpg"
-          background={true}
+          background
           blur={0}
-          intensity={1.5}
         />
 
-        <ambientLight intensity={0.3} color="#ffd9b3" />
+        <hemisphereLight intensity={0.3} groundColor="#ffd9b3" />
         <directionalLight 
-          position={[4, 1, 10]} 
-          intensity={7} 
-          color="#ffb366"
-          castShadow 
-          shadow-mapSize={[2048, 2048]}
-          shadow-bias={-0.0001}
-        />
+          castShadow
+          position={[4, 1, 10]}
+          intensity={7}
+        >
+          <orthographicCamera 
+            attach="shadow-camera"
+            args={[-10, 10, 10, -10, 0.1, 100]}
+          />
+        </directionalLight>
+        
         <spotLight
+          castShadow
           position={[-5, 8, -5]}
-          angle={0.3}
           penumbra={1}
           intensity={400}
           color="#b3d9ff"
-          castShadow
           shadow-camera-far={50}
         />
-          <Park3D 
+        
+        <Park3D 
           isBirdHovered={isBirdHovered}
           isCatHovered={isCatHovered}
           isSignHovered={isSignHovered}
-        />        
-        {/* <EffectComposer>
-          <Bloom 
-            intensity={0.7} 
-            luminanceThreshold={0.7} 
-            luminanceSmoothing={0.4}
-            blendFunction={1} // Normal blend mode
+        />
+
+ 
+
+        <AccumulativeShadows
+          position={[0, -0.99, 0]}
+          scale={100}
+          frames={100}
+          temporal
+          opacity={0.8}
+          color="#2a2a2a"
+          blend={0.7}
+        >
+          <RandomizedLight
+            amount={8}
+            radius={6}
+            intensity={1.2}
+            position={[3, 5, 3]}
+            bias={0.001}
           />
-          <ChromaticAberration offset={[0.0015, 0.0015]} />
-          <BrightnessContrast brightness={0.05} contrast={0.15} />
-        </EffectComposer> */}
+          <RandomizedLight
+            amount={4}
+            radius={4}
+            intensity={0.8}
+            position={[-5, 7, -5]}
+            color="#b3d9ff"
+            bias={0.001}
+          />
+        </AccumulativeShadows>
+
+        <Preload all />
       </Suspense>
 
-      <OrbitControls 
-        enableZoom={true}
+      <OrbitControls
+        enableZoom
         maxPolarAngle={Math.PI / 2}
         minPolarAngle={Math.PI / 4}
         enableDamping
         dampingFactor={0.05}
       />
-    </Canvas>
+    </>
   );
-};
+});
 
 Scene.propTypes = {
-  trackpadPosition: PropTypes.shape({
-    x: PropTypes.number,
-    y: PropTypes.number
-  }),
+  isBirdHovered: PropTypes.bool,
+  isCatHovered: PropTypes.bool,
+  isSignHovered: PropTypes.bool
+};
+
+const TransformableGroup = memo(({ position, rotation, scale, children }) => {
+  const ref = useRef();
+
+  useEffect(() => {
+    if (ref.current) {
+      if (position) ref.current.position.set(...position);
+      if (rotation) ref.current.rotation.set(...rotation);
+      if (scale) {
+        if (Array.isArray(scale)) {
+          ref.current.scale.set(...scale);
+        } else {
+          ref.current.scale.set(scale, scale, scale);
+        }
+      }
+    }
+  }, [position, rotation, scale]);
+
+  return <group ref={ref}>{children}</group>;
+});
+
+TransformableGroup.propTypes = {
+  children: PropTypes.node,
+  position: PropTypes.arrayOf(PropTypes.number),
+  rotation: PropTypes.arrayOf(PropTypes.number),
+  scale: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.arrayOf(PropTypes.number)
+  ])
+};
+
+const BirdAnimation = memo(({ isBirdHovered }) => (
+  <TransformableGroup
+    position={[5.8, -0.4, 7.2]}
+    rotation={[0, Math.PI / 6, 0]}
+  >
+    <Bird scale={0.32} playAnimation={isBirdHovered} />
+  </TransformableGroup>
+));
+
+BirdAnimation.propTypes = {
+  isBirdHovered: PropTypes.bool
+};
+
+const CatAnimation = memo(({ isCatHovered }) => {
+  const { scene, animations } = useGLTF('/models/cat.glb');
+  const modelRef = useRef();
+  const { actions } = useAnimations(animations, modelRef);
+    useEffect(() => {
+    const currentActions = actions;
+    // Play all available animations when hovered
+    if (currentActions) {
+      Object.values(currentActions).forEach(action => {
+        if (action && typeof action.reset === 'function') {
+          if (isCatHovered) {
+            action.reset().fadeIn(0.2).play();
+          } else {
+            action.fadeOut(0.2);
+          }
+        }
+      });
+    }
+    return () => {
+      if (currentActions) {
+        Object.values(currentActions).forEach(action => {
+          if (action && typeof action.stop === 'function') {
+            try {
+              action.stop();
+            } catch (error) {
+              console.warn('Error stopping cat animation:', error);
+            }
+          }
+        });
+      }
+    };
+  }, [isCatHovered, actions]);
+
+  return (
+    <TransformableGroup
+      position={[2.8, -0.9, 3.2]}
+      rotation={[0, -Math.PI / 2, 0]}
+      scale={0.08}
+    >
+      <group ref={modelRef}>
+        <primitive object={scene} />
+      </group>
+    </TransformableGroup>
+  );
+});
+
+CatAnimation.propTypes = {
+  isCatHovered: PropTypes.bool
+};
+
+const SignAnimation = memo(({ isSignHovered }) => {
+  const { scene, animations } = useGLTF('/models/sign.glb');
+  const modelRef = useRef();
+  const { actions } = useAnimations(animations, modelRef);
+    useEffect(() => {
+    const currentActions = actions;
+    // Play all available animations when hovered
+    if (currentActions) {
+      Object.values(currentActions).forEach(action => {
+        if (action && typeof action.reset === 'function') {
+          if (isSignHovered) {
+            action.reset().fadeIn(0.2).play();
+          } else {
+            action.fadeOut(0.2);
+          }
+        }
+      });
+    }
+    return () => {
+      if (currentActions) {
+        Object.values(currentActions).forEach(action => {
+          if (action && typeof action.stop === 'function') {
+            try {
+              action.stop();
+            } catch (error) {
+              console.warn('Error stopping sign animation:', error);
+            }
+          }
+        });
+      }
+    };
+  }, [isSignHovered, actions]);
+
+  return (
+    <TransformableGroup
+      position={[2.9, 2.8, 0]}
+      rotation={[0, Math.PI / 3, 0]}
+      scale={0.8}
+    >
+      <group ref={modelRef}>
+        <primitive object={scene} />
+      </group>
+    </TransformableGroup>
+  );
+});
+
+SignAnimation.propTypes = {
+  isSignHovered: PropTypes.bool
+};
+
+const Park3D = memo(({ isBirdHovered, isCatHovered, isSignHovered }) => {
+  return (
+    <group>
+      <BirdAnimation isBirdHovered={isBirdHovered} />
+      <CatAnimation isCatHovered={isCatHovered} />
+      <SignAnimation isSignHovered={isSignHovered} />
+    </group>
+  );
+});
+
+Park3D.propTypes = {
   isBirdHovered: PropTypes.bool,
   isCatHovered: PropTypes.bool,
   isSignHovered: PropTypes.bool
@@ -564,29 +687,14 @@ const ParkAudioScene = () => {
   const [isSignHovered, setIsSignHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [activeAudioSource, setActiveAudioSource] = useState(null);
-    // Effect handler for hovering on audio sources
-  const handleAudioHover = (source, isHovered) => {
+  const handleAudioHover = useCallback((source, isHovered) => {
     if (isHovered) {
       setActiveAudioSource(source);
-      // When changing audio sources, we need to make sure the audio context is in running state
-      if (typeof window !== 'undefined' && window.audioRefsForVisualizer) {
-        const audioRefs = window.audioRefsForVisualizer.current;
-        if (audioRefs) {
-          // Ensure audio context is running
-          const audioContext = audioRefs.sign?.gain?.context || 
-                              audioRefs.birds?.gain?.context || 
-                              audioRefs.cat?.gain?.context;
-          
-          if (audioContext && audioContext.state === 'suspended') {
-            audioContext.resume().catch(err => console.warn('Failed to resume audio context:', err));
-          }
-        }
-      }
     } else if (activeAudioSource === source) {
       setActiveAudioSource(null);
     }
-  }
-  
+  }, [activeAudioSource]);
+
   // Use effect to simulate loading
   useEffect(() => {
     // Simulate loading time
@@ -604,42 +712,42 @@ const ParkAudioScene = () => {
   return (
     <div className="h-full grid grid-rows-[1fr,auto]">
       <div className="relative w-full h-full">
-        <Scene 
-          trackpadPosition={trackpadPosition} 
-          isBirdHovered={isBirdHovered}
-          isCatHovered={isCatHovered}
-          isSignHovered={isSignHovered}
-        />
-        
-        {/* Audio source indicator */}
+        <Canvas shadows dpr={[1, 2]} camera={{ position: [10, 2, 10], fov: 60 }}>
+          <Scene
+            isBirdHovered={isBirdHovered}
+            isCatHovered={isCatHovered}
+            isSignHovered={isSignHovered}
+          />
+        </Canvas>
+
         {activeAudioSource && (
           <div className="absolute top-12 right-4 bg-black bg-opacity-70 text-white px-3 py-2 rounded-full text-sm font-medium flex items-center space-x-2 animate-[fadeIn_0.5s_ease-in-out]">
             <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-[pulse_1.5s_infinite_ease-in-out]"></span>
             <span>Focusing on: {activeAudioSource}</span>
           </div>
-        )}
-        
-        {/* Audio visualizer */}
-        <AudioVisualizer 
-          activeAudioSource={activeAudioSource} 
-          audioRefs={typeof window !== 'undefined' ? window.audioRefsForVisualizer : null}
+        )}        <AudioVisualizer
+          activeAudioSource={activeAudioSource}
+          audioRefs={window.audioRefs?.current}
         />
-      </div>
-      
-      <div className="h-[25vh] min-h-[200px] max-h-[250px] bg-gradient-to-b from-gray-900 to-gray-800 backdrop-blur-md">
-        <AudioController 
-          onPositionChange={setTrackpadPosition} 
+      </div>      <div className="h-[25vh] min-h-[200px] max-h-[250px] bg-gradient-to-b from-gray-900 to-gray-800 backdrop-blur-md">
+        <AudioController
+          ref={audioRefs => {
+            if (audioRefs) {
+              window.audioRefs = audioRefs;
+            }
+          }}
+          onPositionChange={setTrackpadPosition}
           onBirdHover={(isHovered) => {
             setIsBirdHovered(isHovered);
-            handleAudioHover('Birds', isHovered);
+            handleAudioHover('birds', isHovered);
           }}
           onCatHover={(isHovered) => {
             setIsCatHovered(isHovered);
-            handleAudioHover('Cat', isHovered);
+            handleAudioHover('cat', isHovered);
           }}
           onSignHover={(isHovered) => {
             setIsSignHovered(isHovered);
-            handleAudioHover('Sign', isHovered);
+            handleAudioHover('sign', isHovered);
           }}
         />
       </div>
