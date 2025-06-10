@@ -1,22 +1,21 @@
 import { useRef } from "react";
- import { Braint } from "../components/Braint";
-import { Canvas } from "@react-three/fiber";
 import SimButton from "../components/SimButton";
-import { NeuralActivity } from "../components/NeuralActivity";
 import Attention from './Attention';
+import LazyImage from "../components/LazyImage";
 
-const About = () => {
-  const grid2Container = useRef();
+const About = () => {  const grid2Container = useRef();
+  const grid3Container = useRef();
+  const grid5Container = useRef();
   const brainRef = useRef();
   return (
     <section className="c-space section-spacing" id="about">
     <Attention />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-6 md:auto-rows-[18rem] mt-12">
-        {/* Grid 1 */}
-        <div className="flex items-end grid-default-color grid-1">
-          <img
+        {/* Grid 1 */}        <div className="flex items-end grid-default-color grid-1">
+          <LazyImage
             src="assets/hp.png"
             className="absolute scale-[1.75] -right-[5rem] -top-[1rem] md:scale-[3] md:left-50 md:inset-y-10 lg:scale-[2.5]"
+            alt="Headphone visualization"
           />
           <div className="z-10">
             <p className="headtext">Move beyond passive listening</p>
@@ -30,53 +29,38 @@ const About = () => {
         <div className="grid-default-color grid-2">        
         <div
             ref={grid2Container}
-            className="flex items-center justify-center w-full h-full"
-          >
-            <img
+            className="flex items-center justify-center w-full h-full rounded-[24px] relative overflow-hidden"
+          >            <LazyImage
             src="images/vr.png"
             className="absolute z-0 -top-[30px]"
-            alt=""
+            alt="VR headset visualization"
           />
           <div className="z-10">
-            <p className="absolute left-4 bottom-4 headtext">AR/VR Integration</p>
+            <p className="absolute left-4 bottom-0 headtext">AR/VR Integration</p>
           </div>
         </div>
 
-        </div>
-        {/* Grid 3 */}
-        <div className="grid-black-color grid-3">
-          <div className="z-10 w-[50%]">
-            <p className="headtext">Temporal Response Fn</p>
-            <p className="subtext">
-               (TRF) facilitates a mapping b/w features of sound & EEG responses from the auditory cortex
-            </p>
+        </div>        {/* Grid 3 */}
+        <div className="grid-black-color grid-3 relative overflow-hidden"> 
+          <div
+            ref={grid3Container}
+            className="flex items-center justify-center w-full h-full relative rounded-[24px] overflow-hidden"
+            > 
+            <LazyImage
+              src="assets/projects/auditorycortex.jpg"
+              className="absolute inset-0 w-full h-full object-cover"
+              alt="Auditory cortex visualization"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            <div className="z-10 p-4 absolute inset-0 flex flex-col justify-end md:justify-center">
+              <div className="w-full md:max-w-[80%]">
+                <p className="headtext text-white md:text-black text-2xl md:text-3xl font-bold mb-2">Temporal Response Fn</p>
+                <p className="text-gray-800 md:text-black/80 text-sm md:text-base">
+                  (TRF) facilitates a mapping b/w features of sound & EEG responses
+                </p>
+              </div>
+            </div>
           </div>
-          <figure className="absolute left-[25%] top-[5%] w-[70%] h-[70%]">
-            <Canvas
-              camera={{ position: [0, 0, 5], fov: 50 }}
-              className="w-full h-full"
-              style={{ pointerEvents: "none" }}
-              gl={{ antialias: true, alpha: true }}
-              dpr={[1, 2]}
-            >              <ambientLight />
-              <directionalLight
-                position={[10, 10, 5]}
-                intensity={2}
-              />
-              <Braint 
-                // ref={brainRef} 
-                scale={0.045} 
-                position={[0.8, -1.3, 0]} 
-              />
-              <NeuralActivity
-                scale={1.25}
-                position={[0.8, -0.2, 0.16]}
-                rotation={[-Math.PI/2, -Math.PI / 72, 0]}
-                color="#4f9dff"
-              />
-              {/* <Lights brainRotation={brainRef.current?.rotation.y || 0} /> */}
-            </Canvas>
-          </figure>
         </div>
         {/* Grid 4 */}
         <div className="grid-special-color grid-4">
@@ -87,20 +71,19 @@ const About = () => {
             <SimButton />
 
           </div>
-        </div>
-        {/* Grid 5 */}
+        </div>        {/* Grid 5 */}
         <div className="grid-default-color grid-5">
            <div
-            ref={grid2Container}
-            className="flex items-center justify-center w-full h-full"
+            ref={grid5Container}
+            className="flex items-center justify-center w-full h-full rounded-[24px] relative overflow-hidden"
           >
-            <img
+          <LazyImage
             src="assets/ci.png"
             className="absolute z-0 -top-[80px]"
-            alt=""
+            alt="Cochlear Implant visualization"
           />
           <div className="z-10">
-            <p className="absolute left-4 bottom-4 headtext">Cochlear Implant Integration</p>
+            <p className="absolute left-2 bottom-0 headtext">Cochlear Implant Integration</p>
           </div>
         </div>
         </div>

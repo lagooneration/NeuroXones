@@ -6,6 +6,7 @@ import { useRef, useMemo } from 'react'
 import { useGLTF, useTexture, Clone } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import PropTypes from 'prop-types'
 
 // Custom vertex shader for extrusion effect with neural activity
 const vertexShader = `
@@ -96,7 +97,7 @@ const fragmentShader = `
 
 export function Brain(props) {
   const group = useRef()
-  const { scene } = useGLTF('/models/brain.glb')
+  const { scene } = useGLTF('/models/brain.glb', true) // Added draco decoder option
   const mousePosition = useRef(new THREE.Vector3())
   const raycaster = useRef(new THREE.Raycaster())
   const gradientMap = useTexture('/gradients/5.jpg')
@@ -187,14 +188,20 @@ export function Brain(props) {
   
   return (
     <group {...props}>
-      <group ref={group}>        {/* Original model with toon material */}
+      <group ref={group}>        
+        {/* Original model with toon material */}
         <Clone object={toonBrain} />
         
         {/* Wireframe overlay */}
         <Clone object={wireframeBrain} />
       </group>
-    </group>
-  )
+    </group>  )
+}
+
+Brain.propTypes = {
+  position: PropTypes.array,
+  rotation: PropTypes.array,
+  scale: PropTypes.array
 }
 
 useGLTF.preload('/models/brain.glb')

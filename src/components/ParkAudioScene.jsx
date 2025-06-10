@@ -429,7 +429,7 @@ const Scene = memo(({ isBirdHovered, isCatHovered, isSignHovered }) => {
       
       <Suspense fallback={null}>
         <Environment 
-          files="/assets/env/anime_art_style_japan_streets_with_cherry_blossom_.jpg"
+          files="/assets/env/background.jpg"
           background
           blur={0}
         />
@@ -721,15 +721,17 @@ const ParkAudioScene = () => {
         </Canvas>
 
         {activeAudioSource && (
-          <div className="absolute top-12 right-4 bg-black bg-opacity-70 text-white px-3 py-2 rounded-full text-sm font-medium flex items-center space-x-2 animate-[fadeIn_0.5s_ease-in-out]">
+          <div className="absolute top-16 right-4 bg-black bg-opacity-70 text-white px-3 py-2 rounded-full text-sm font-medium flex items-center space-x-2 animate-[fadeIn_0.5s_ease-in-out]">
             <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-[pulse_1.5s_infinite_ease-in-out]"></span>
             <span>Focusing on: {activeAudioSource}</span>
           </div>
-        )}        <AudioVisualizer
+        )}        
+        {/* <AudioVisualizer
           activeAudioSource={activeAudioSource}
           audioRefs={window.audioRefs?.current}
-        />
-      </div>      <div className="h-[25vh] min-h-[200px] max-h-[250px] bg-gradient-to-b from-gray-900 to-gray-800 backdrop-blur-md">
+        /> */}
+      </div>      
+      <div className="h-[25vh] min-h-[200px] max-h-[250px] bg-gradient-to-b from-gray-900 to-gray-800 backdrop-blur-md">
         <AudioController
           ref={audioRefs => {
             if (audioRefs) {

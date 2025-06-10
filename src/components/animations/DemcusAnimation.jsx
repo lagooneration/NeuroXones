@@ -27,7 +27,7 @@ const DemcusAnimation = () => {
   }, []);
   
   return (
-    <div className="w-full h-40 flex flex-col items-center justify-center">
+    <div className="w-full h-48 flex flex-col items-center justify-center">
       {/* Original mixed sound waves */}
       <div className="w-full h-12 relative mb-6">
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">

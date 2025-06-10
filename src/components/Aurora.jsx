@@ -1,5 +1,6 @@
 import { Renderer, Program, Mesh, Color, Triangle } from "ogl";
 import { useEffect, useRef } from "react";
+import PropTypes from 'prop-types';
 
 const VERT = `#version 300 es
 in vec2 position;
@@ -119,88 +120,132 @@ export default function Aurora(props) {
   propsRef.current = props;
 
   const ctnDom = useRef(null);
-
   useEffect(() => {
     const ctn = ctnDom.current;
     if (!ctn) return;
 
-    const renderer = new Renderer({
-      alpha: true,
-      premultipliedAlpha: true,
-      antialias: true
-    });
-    const gl = renderer.gl;
-    gl.clearColor(0, 0, 0, 0);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    gl.canvas.style.backgroundColor = 'transparent';
-
+    let renderer;
+    let gl;
     let program;
-
+    let mesh;
+    let animateId = 0;    // Define resize function outside of the try block so it's accessible throughout the scope
     function resize() {
-      if (!ctn) return;
+      if (!ctn || !renderer) return;
       const width = ctn.offsetWidth;
       const height = ctn.offsetHeight;
-      renderer.setSize(width, height);
-      if (program) {
-        program.uniforms.uResolution.value = [width, height];
+      if (width === 0 || height === 0) return; // Skip resize if dimensions are 0
+      
+      try {
+        renderer.setSize(width, height);
+        if (program) {
+          program.uniforms.uResolution.value = [width, height];
+        }
+      } catch (error) {
+        console.warn("Error during resize:", error);
       }
     }
-    window.addEventListener("resize", resize);
-
-    const geometry = new Triangle(gl);
-    if (geometry.attributes.uv) {
-      delete geometry.attributes.uv;
-    }
-
-    const colorStopsArray = colorStops.map((hex) => {
-      const c = new Color(hex);
-      return [c.r, c.g, c.b];
-    });
-
-    program = new Program(gl, {
-      vertex: VERT,
-      fragment: FRAG,
-      uniforms: {
-        uTime: { value: 0 },
-        uAmplitude: { value: amplitude },
-        uColorStops: { value: colorStopsArray },
-        uResolution: { value: [ctn.offsetWidth, ctn.offsetHeight] },
-        uBlend: { value: blend }
+    
+    try {
+      renderer = new Renderer({
+        alpha: true,
+        premultipliedAlpha: true,
+        antialias: true
+      });
+      
+      gl = renderer.gl;
+      if (!gl) {
+        console.warn("WebGL context not available");
+        return;
       }
-    });
+      
+      gl.clearColor(0, 0, 0, 0);
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+      gl.canvas.style.backgroundColor = 'transparent';
 
-    const mesh = new Mesh(gl, { geometry, program });
-    ctn.appendChild(gl.canvas);
+      window.addEventListener("resize", resize);
 
-    let animateId = 0;
-    const update = (t) => {
-      animateId = requestAnimationFrame(update);
-      const { time = t * 0.01, speed = 1.0 } = propsRef.current;
-      program.uniforms.uTime.value = time * speed * 0.1;
-      program.uniforms.uAmplitude.value = propsRef.current.amplitude ?? 1.0;
-      program.uniforms.uBlend.value = propsRef.current.blend ?? blend;
-      const stops = propsRef.current.colorStops ?? colorStops;
-      program.uniforms.uColorStops.value = stops.map((hex) => {
+      const geometry = new Triangle(gl);
+      if (geometry.attributes.uv) {
+        delete geometry.attributes.uv;
+      }
+
+      const colorStopsArray = colorStops.map((hex) => {
         const c = new Color(hex);
         return [c.r, c.g, c.b];
       });
-      renderer.render({ scene: mesh });
-    };
-    animateId = requestAnimationFrame(update);
 
-    resize();
+      program = new Program(gl, {
+        vertex: VERT,
+        fragment: FRAG,
+        uniforms: {
+          uTime: { value: 0 },
+          uAmplitude: { value: amplitude },
+          uColorStops: { value: colorStopsArray },
+          uResolution: { value: [ctn.offsetWidth || 1, ctn.offsetHeight || 1] },
+          uBlend: { value: blend }
+        }
+      });
+
+      mesh = new Mesh(gl, { geometry, program });
+      
+      // Safety check before appending canvas
+      if (ctn && gl.canvas) {
+        ctn.appendChild(gl.canvas);
+      } else {
+        console.warn("Container or canvas is null, cannot append canvas");
+        return;
+      }
+
+      const update = (t) => {
+        if (!program || !renderer || !mesh) return;
+        
+        animateId = requestAnimationFrame(update);
+        const { time = t * 0.01, speed = 1.0 } = propsRef.current;
+        program.uniforms.uTime.value = time * speed * 0.1;
+        program.uniforms.uAmplitude.value = propsRef.current.amplitude ?? 1.0;
+        program.uniforms.uBlend.value = propsRef.current.blend ?? blend;
+        
+        const stops = propsRef.current.colorStops ?? colorStops;
+        program.uniforms.uColorStops.value = stops.map((hex) => {
+          const c = new Color(hex);
+          return [c.r, c.g, c.b];
+        });
+        
+        renderer.render({ scene: mesh });
+      };
+      
+      animateId = requestAnimationFrame(update);
+      resize();
+    } catch (error) {
+      console.error("Error initializing WebGL:", error);
+    }
 
     return () => {
       cancelAnimationFrame(animateId);
       window.removeEventListener("resize", resize);
-      if (ctn && gl.canvas.parentNode === ctn) {
-        ctn.removeChild(gl.canvas);
+      
+      try {
+        if (ctn && gl && gl.canvas && gl.canvas.parentNode === ctn) {
+          ctn.removeChild(gl.canvas);
+        }
+        
+        if (gl) {
+          const extension = gl.getExtension("WEBGL_lose_context");
+          if (extension) extension.loseContext();
+        }
+      } catch (error) {
+        console.warn("Error during cleanup:", error);
       }
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amplitude]);
-
+  }, [amplitude, colorStops, blend]);
   return <div ref={ctnDom} className="w-full h-full" />;
 }
+
+Aurora.propTypes = {
+  colorStops: PropTypes.array,
+  amplitude: PropTypes.number,
+  blend: PropTypes.number,
+  speed: PropTypes.number,
+  time: PropTypes.number
+};

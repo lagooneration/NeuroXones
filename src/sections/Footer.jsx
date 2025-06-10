@@ -1,4 +1,6 @@
 import { mySocials } from "../constants";
+import LazyImage from "../components/LazyImage";
+
 const Footer = () => {
   return (
     <section className="flex flex-wrap items-center justify-between gap-5 pb-3 text-sm text-neutral-400 c-space">
@@ -7,11 +9,10 @@ const Footer = () => {
         <p>Terms & Conditions</p>
         <p>|</p>
         <p>Privacy Policy</p>
-      </div>
-      <div className="flex gap-3">
+      </div>      <div className="flex gap-3">
         {mySocials.map((social, index) => (
           <a href={social.href} key={index}>
-            <img src={social.icon} className="w-5 h-5" alt={social.name} />
+            <LazyImage src={social.icon} className="w-5 h-5" alt={social.name} />
           </a>
         ))}
       </div>

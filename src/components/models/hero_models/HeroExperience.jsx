@@ -44,13 +44,12 @@ const Scene = () => {
     position: [0, 20, 0],
     config: { mass: 1, tension: 280, friction: 60 }
   }));
-
   const animateModels = useCallback(() => {
-    setBrainSpring({
+    setBrainSpring.start({
       position: isSmallMobile ? [0, -2.0, 0] : isMobile ? [0, -1.8, 0] : [0, -1.2, 0],
       delay: 300
     });
-    setHpSpring({
+    setHpSpring.start({
       position: isSmallMobile ? [0, -4.5, 0] : isMobile ? [0, -4.2, 0] : [0, -3.2, 0],
       delay: 500
     });
@@ -63,15 +62,18 @@ const Scene = () => {
   }, [progress, animateModels]);
 
   return (
-    <>
-      <ambientLight intensity={0.2} />
+    <>      <ambientLight intensity={0.2} />
       <OrbitControls
         enablePan={false}
         enableZoom={false}
+        enableRotate={true}
         maxDistance={20}
         minDistance={5}
-        minPolarAngle={Math.PI / 5}
+        // Lock vertical rotation by setting both angles to the same value
+        minPolarAngle={Math.PI / 2}
         maxPolarAngle={Math.PI / 2}
+        // Optional: Control rotation speed
+        rotateSpeed={0.5}
       />
 
       <HeroLights />

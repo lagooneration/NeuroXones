@@ -30,7 +30,7 @@ const ConvTasNetAnimation = () => {
   }, []);
   
   return (
-    <div className="w-full h-40 flex flex-col items-center justify-center">
+    <div className="w-full h-48 flex flex-col items-center justify-center">
       {/* Input audio wave */}
       <div className="relative w-full h-10 mb-3">
         <div className="text-xs text-white opacity-50 absolute left-2 top-0">Input</div>

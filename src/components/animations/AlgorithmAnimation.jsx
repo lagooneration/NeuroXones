@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import PropTypes from 'prop-types';
 import DemcusAnimation from "./DemcusAnimation";
 import ConvTasNetAnimation from "./ConvTasNetAnimation";
 import AADAnimation from "./AADAnimation";
@@ -14,13 +15,24 @@ export const ANIMATION_DURATIONS = {
 
 const AlgorithmAnimation = ({ algorithmId, shouldPlay = true }) => {
   const [key, setKey] = useState(0);
+  const previousId = useRef(algorithmId);
+  const initialRender = useRef(true);
   
   // Reset animation when algorithmId changes or shouldPlay becomes true
   useEffect(() => {
-    if (shouldPlay) {
-      setKey(prevKey => prevKey + 1);
+    // Force a reset on initial render
+    if (initialRender.current) {
+      setKey(1);
+      initialRender.current = false;
+      previousId.current = algorithmId;
+      return;
     }
-  }, [algorithmId, shouldPlay]);
+    
+    if (shouldPlay && (previousId.current !== algorithmId || key === 0)) {
+      setKey(prevKey => prevKey + 1);
+      previousId.current = algorithmId;
+    }
+  }, [algorithmId, shouldPlay, key]);
 
   // Map algorithm IDs to components
   const getAnimationComponent = () => {
@@ -39,10 +51,19 @@ const AlgorithmAnimation = ({ algorithmId, shouldPlay = true }) => {
   };
 
   return (
-    <div className="w-full h-40 bg-[#030412] rounded-md overflow-hidden">
+    <div className="w-full h-52 bg-[#030412] rounded-md overflow-hidden">
       {getAnimationComponent()}
     </div>
   );
+};
+
+AlgorithmAnimation.propTypes = {
+  algorithmId: PropTypes.number.isRequired,
+  shouldPlay: PropTypes.bool
+};
+
+AlgorithmAnimation.defaultProps = {
+  shouldPlay: true
 };
 
 export default AlgorithmAnimation;

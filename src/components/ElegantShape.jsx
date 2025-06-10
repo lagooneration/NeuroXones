@@ -1,7 +1,6 @@
-"use client";
-
 import { motion } from "framer-motion";
 import { cn } from "../lib/utils";
+import PropTypes from 'prop-types';
 
 function ElegantShape({
     className,
@@ -22,16 +21,15 @@ function ElegantShape({
                 opacity: 1,
                 y: 0,
                 rotate: rotate,
-            }}
-            transition={{
+            }}            transition={{
                 duration: 2.4,
                 delay,
                 ease: [0.23, 0.86, 0.39, 0.96],
                 opacity: { duration: 1.2 },
             }}
             className={cn("absolute", className)}
-        >
-            <motion.div
+            style={{ position: "absolute" }} // Ensure position is explicitly set
+        >            <motion.div
                 animate={{
                     y: [0, 15, 0],
                 }}
@@ -43,6 +41,7 @@ function ElegantShape({
                 style={{
                     width,
                     height,
+                    position: "relative", // Ensure non-static position for scroll calculations
                 }}
                 className="relative"
             >
@@ -58,8 +57,16 @@ function ElegantShape({
                     )}
                 />
             </motion.div>
-        </motion.div>
-    );
+        </motion.div>    );
 }
+
+ElegantShape.propTypes = {
+    className: PropTypes.string,
+    delay: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    rotate: PropTypes.number,
+    gradient: PropTypes.string
+};
 
 export { ElegantShape };

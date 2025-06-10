@@ -1,9 +1,10 @@
 import Aurora from "../components/Aurora";
-import TrueFocus from '../components/TrueFocus';
+import OptimizedTrueFocus from '../components/OptimizedTrueFocus';
 import HeroButton from "../components/HeroButton";
 import HeroExperience from "../components/models/hero_models/HeroExperience";
 import { motion } from "framer-motion";
 import { ElegantShape } from "../components/ElegantShape";
+import LazyImage from "../components/LazyImage";
 
 const Hero = () => {
   const fadeUpVariants = {
@@ -92,11 +93,16 @@ const Hero = () => {
           <div className="flex flex-col gap-4 md:gap-7">
               <motion.div
                 custom={0}
-                variants={fadeUpVariants}
+                variants={fadeUpVariants}                
                 initial="hidden"
                 animate="visible"
               >
-                <img src="/assets/logos/heading.svg" alt="Heading" className="w-36 sm:w-42 md:w-48" />
+                <LazyImage 
+                  src="/assets/logos/heading.svg" 
+                  alt="Heading" 
+                  className="w-36 sm:w-42 md:w-48" 
+                  fetchPriority="high"
+                />
               </motion.div>
 
               <motion.div
@@ -104,15 +110,15 @@ const Hero = () => {
                 variants={fadeUpVariants}
                 initial="hidden"
                 animate="visible"
-                className="flex items-start gap-2 md:gap-4"
-              >
-                <TrueFocus 
+                className="flex items-start gap-2 md:gap-4">                
+                <OptimizedTrueFocus 
                   sentence="Attention Detection"
                   manualMode={false}
                   blurAmount={5}
                   borderColor="green"
                   animationDuration={2}
                   pauseBetweenAnimations={1}
+                  importance="high"
                 />
               </motion.div>
               

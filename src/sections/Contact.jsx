@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import emailjs from "@emailjs/browser";
 import Alert from "../components/Alert";
-import { Particles } from "../components/Particles";
+// import Dither from "../components/Dither";
 // import MatellicPaint from '../components/MatellicPaint';
 
 const Contact = () => {
@@ -58,13 +58,6 @@ const Contact = () => {
   return (
     
     <section id="contact" className="relative flex items-center c-space section-spacing">
-      <Particles
-        className="absolute inset-0 -z-50"
-        quantity={100}
-        ease={80}
-        color={"#ffffff"}
-        refresh
-      />
       {showAlert && <Alert type={alertType} text={alertMessage} />}
       <div className="flex flex-col items-center justify-center max-w-md p-5 mx-auto border border-white/10 rounded-2xl bg-primary">
         <div className="flex flex-col items-start w-full gap-5 mb-10">

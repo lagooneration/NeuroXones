@@ -9,6 +9,7 @@ const TrueFocus = ({
   glowColor = "rgba(0, 255, 0, 0.6)",
   animationDuration = 0.5,
   pauseBetweenAnimations = 1,
+  importance = "auto",
 }) => {
   const words = sentence.split(" ");
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -64,8 +65,7 @@ const TrueFocus = ({
         return (
           <span
             key={index}
-            ref={(el) => (wordRefs.current[index] = el)}
-            className="relative text-[1.8rem] sm:text-[2.2rem] md:text-[3rem] font-black cursor-pointer"
+            ref={(el) => (wordRefs.current[index] = el)}            className="relative text-[1.8rem] sm:text-[2.2rem] md:text-[3rem] font-black cursor-pointer"
             style={{
               filter: manualMode
                 ? isActive
@@ -77,6 +77,9 @@ const TrueFocus = ({
               "--border-color": borderColor,
               "--glow-color": glowColor,
               transition: `filter ${animationDuration}s ease`,
+              willChange: "filter",
+              contentVisibility: "auto",
+              contain: "content"
             }}
             onMouseEnter={() => handleMouseEnter(index)}
             onMouseLeave={handleMouseLeave}
