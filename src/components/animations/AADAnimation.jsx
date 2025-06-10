@@ -65,7 +65,7 @@ const AADAnimation = () => {
   return (
     <div className="w-full h-48 flex flex-col items-center justify-center bg-[#030412]">
       {/* Audio sources row */}
-      <div className="w-full flex justify-around mb-2">
+      <div className="w-full flex justify-around mt-3">
         {audioSources.map((source, idx) => (
           <motion.div
             key={source.id}
@@ -287,6 +287,7 @@ const AADAnimation = () => {
             />
           ))}
         </motion.div>
+
         
         {/* Connection lines from brain to all audio sources */}
         <motion.svg
@@ -346,6 +347,14 @@ const AADAnimation = () => {
           )}
         </motion.svg>
       </div>
+      <motion.div 
+              className="text-white text-xs font-bold"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+            >
+              ⚠️ 0.5 to 2 seconds
+            </motion.div>
       
       <motion.div 
         className="text-xs text-white font-bold mt-1"
@@ -353,7 +362,7 @@ const AADAnimation = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
       >
-        Auditory Attention Detection
+        for Attention Decoding
       </motion.div>
     </div>
   );

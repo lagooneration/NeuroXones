@@ -66,6 +66,7 @@ const ConvTasNetAnimation = () => {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.5 + filterIdx * 0.2, duration: 0.3 }}
           >
+
             {filter.map((value, valueIdx) => (
               <motion.div 
                 key={valueIdx}
@@ -85,6 +86,14 @@ const ConvTasNetAnimation = () => {
           </motion.div>
         ))}
       </div>
+      <motion.div 
+              className="text-white text-xs font-bold"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+            >
+              Low Latency, Suitable for Real-Time
+            </motion.div>
         {/* Convolution operation indicator */}
       <motion.div 
         className="text-xs text-[#3a29ff] font-bold mb-3 relative"

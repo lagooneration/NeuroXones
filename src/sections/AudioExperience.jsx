@@ -105,7 +105,7 @@ const AudioExperience = () => {
           <TitleHeader />
         </div>
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-sm text-gray-400 z-10">
-          Move cursor to focus on sound of interest
+          Click anywhere and move cursor to focus on sound of interest
         </div>
         <div
           className="h-full"

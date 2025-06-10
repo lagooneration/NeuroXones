@@ -211,6 +211,15 @@ const DPRNNAnimation = () => {
         DPRNN: Dual-Path RNN
       </motion.div>
       
+      <motion.div 
+              className="text-white text-xs font-bold"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+            >
+              RTF = 0.65
+            </motion.div>
+      
       {/* Efficiency indicator */}
       {processingStage === 3 && (
         <motion.div 

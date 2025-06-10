@@ -72,18 +72,17 @@ AlgorithmDetails.displayName = 'AlgorithmDetails';
 
 const Algo = () => {
     const [currentAlgorithm, setCurrentAlgorithm] = useState(0);
-    
-    // Memoize algorithm configurations
+      // Memoize algorithm configurations
     const algorithms = useMemo(() => [
         {
             id: 1,
-            title: "Demcus",
-            shortTitle: "Demcus",
-            description: "Speech Separation algorithm that isolates individual speakers",
+            title: "Demucs",
+            shortTitle: "Demucs",
+            description: "Hybrid Transformer-based Music Source Separation",
             icon: <FiCircle />,
-            fullTitle: "Demcus: Speech Separation",
-            fullDescription: "Demcus employs deep neural networks to separate mixed audio streams, isolating individual speakers from complex soundscapes. It allows our system to create distinct audio channels that can be selectively enhanced based on user attention.",
-            benefits: ["Isolates individual speakers in crowded environments", "Reduces background noise by up to 85%", "Works with multiple overlapping voices"]
+            fullTitle: "Demucs: Advanced Audio Separation",
+            fullDescription: "Demucs is a state-of-the-art hybrid model combining waveform and spectrogram domain separation, achieving 9.0 dB SDR on benchmark datasets. Originally developed by Facebook Research for music source separation, we've adapted it for selective auditory stream isolation in complex acoustic environments.",
+            benefits: ["Separates overlapping sounds with up to 9.0 dB Signal-to-Distortion Ratio", "Processes both time and frequency domains for superior separation quality", "Optimized for real-time performance on embedded neural hardware"]
         },
         {
             id: 2,
@@ -91,9 +90,9 @@ const Algo = () => {
             shortTitle: "ConvTasNet",
             description: "Time-domain Audio Separation Network to separate audio streams",
             icon: <FiCode />,
-            fullTitle: "ConvTasNet: Real-time Processing",
-            fullDescription: "ConvTasNet is our core audio separation technology, using time-domain convolutional networks for ultra-low latency performance. It enables natural listening experiences by processing audio faster than human perception can detect.",
-            benefits: ["Achieves separation in milliseconds", "Adapts to changing acoustic environments", "Preserves natural sound quality"]
+            fullTitle: "ConvTasNet: End-to-End Speech Separation",
+            fullDescription: "ConvTasNet is a fully-convolutional time-domain audio separation network that outperforms traditional spectrogram-based methods. It works directly on waveforms using a learnable encoder-decoder architecture with temporal convolutional networks (TCN).",
+            benefits: ["Processes raw waveforms without spectrogram conversion for lower latency", "Achieves over 15 dB improvement in speech separation quality", "Maintains voice characteristics essential for natural listening experience"]
         },
         {
             id: 3,
@@ -101,9 +100,9 @@ const Algo = () => {
             shortTitle: "AAD",
             description: "Auditory Attention Detection precisely tracks neural activity to track focus",
             icon: <FiFileText />,
-            fullTitle: "AAD: Neural Tracking",
-            fullDescription: "Auditory Attention Detection monitors neural signals in real-time to determine which audio stream you're focusing on. This breakthrough technology bridges the gap between brain activity and sound enhancement.",
-            benefits: ["Tracks attention shifts within 300ms", "Works with non-invasive EEG sensors", "Continuously improves with machine learning"]
+            fullTitle: "AAD: Neural Decoding of Attention",
+            fullDescription: "AAD algorithm decodes neural signals to determine which speaker or sound source has captured attention in multi-talker environments. By correlating EEG readings with speech envelope features, it can identify the attended speaker with up to 95% accuracy.",
+            benefits: ["Decodes attention targets from non-invasive EEG with >90% accuracy", "Adapts to individual neural patterns through personalized calibration", "Responds to attention shifts within 200-300ms, faster than conscious perception"]
         },
         {
             id: 4,
@@ -111,9 +110,9 @@ const Algo = () => {
             shortTitle: "DPRNN",
             description: "Dual-Path Recurrent Neural Network offers unprecedented precision in audio stream separation",
             icon: <FiLayers />,
-            fullTitle: "DPRNN: Computational Efficiency",
-            fullDescription: "Dual-Path Recurrent Neural Networks provide our platform with the computational efficiency needed for mobile applications. This algorithm optimizes resource usage while maintaining exceptional audio quality.",
-            benefits: ["Reduces power consumption by 60%", "Enables all-day wearable use", "Scales processing based on environmental complexity"]
+            fullTitle: "DPRNN: Long Sequence Modeling",
+            fullDescription: "DPRNN addresses the challenge of modeling extremely long audio sequences by dividing the problem into two paths: local and global processing. This architecture efficiently captures both short-term acoustic features and long-term temporal dependencies crucial for speaker tracking.",
+            benefits: ["Reduces computational complexity by up to 70% compared to traditional RNNs", "Maintains contextual awareness across minutes of audio", "Enables efficient training on limited data, critical for personalization"]
         }
     ], []);
 

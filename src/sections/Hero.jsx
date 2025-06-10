@@ -115,7 +115,7 @@ const Hero = () => {
                   sentence="Attention Detection"
                   manualMode={false}
                   blurAmount={5}
-                  borderColor="green"
+                  borderColor="blue"
                   animationDuration={2}
                   pauseBetweenAnimations={1}
                   importance="high"
