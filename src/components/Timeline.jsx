@@ -1,6 +1,8 @@
 "use client";
 import { useScroll, useTransform, motion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
+import PropTypes from 'prop-types';
+import AttentionLagVisualizer from "./AttentionLagVisualizer";
 
 export const Timeline = ({ data }) => {
   const ref = useRef(null);
@@ -22,9 +24,46 @@ export const Timeline = ({ data }) => {
   const heightTransform = useTransform(scrollYProgress, [0, 1], [0, height]);
   const opacityTransform = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
 
+  // Function to render content based on the content string
+  const renderContent = (content) => {
+    // Check if this is a visualizer directive
+    if (content === "visualizer: true") {
+      return (
+        <div className="bg-[#0c0d20] rounded-lg p-4 mb-6">
+          <h4 className="text-sm font-semibold text-white mb-2">Attention Switching Lag:</h4>
+          <AttentionLagVisualizer />
+          <p className="text-xs text-gray-400 text-center italic mt-2">
+            The brain's focus changes (outer ring) before the actual neural response (inner color) due to the ~1.5 second lag
+            required by current AAD algorithms to detect attention.
+          </p>
+        </div>
+      );
+    }
+    
+    // Check if this is a YouTube URL directive
+    if (content.startsWith("youtubeUrl:")) {
+      const youtubeUrl = content.substring("youtubeUrl:".length).trim();
+      return (
+        <div className="relative w-full pb-[56.25%] h-0 overflow-hidden rounded-lg mb-6">
+          <iframe 
+            className="absolute top-0 left-0 w-full h-full"
+            src={youtubeUrl}
+            title="YouTube Video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </div>
+      );
+    }
+    
+    // Default: treat as regular text content
+    return <p className="mb-3 font-normal text-neutral-400">{content}</p>;
+  };
+
   return (
     <div className="c-space section-spacing" ref={containerRef}>
-      <h2 className="text-heading">Research & Development</h2>
+      <h2 className="text-heading text-center">Research & Development</h2>
       <div ref={ref} className="relative pb-20">
         {data.map((item, index) => (
           <div
@@ -47,10 +86,10 @@ export const Timeline = ({ data }) => {
                 <h3>{item.date}</h3>
                 <h3>{item.job}</h3>
               </div>
-              {item.contents.map((content, index) => (
-                <p className="mb-3 font-normal text-neutral-400" key={index}>
-                  {content}
-                </p>
+              {item.contents.map((content, idx) => (
+                <React.Fragment key={idx}>
+                  {renderContent(content)}
+                </React.Fragment>
               ))}
             </div>
           </div>
@@ -72,4 +111,15 @@ export const Timeline = ({ data }) => {
       </div>
     </div>
   );
+};
+
+Timeline.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      date: PropTypes.string,
+      title: PropTypes.string,
+      job: PropTypes.string,
+      contents: PropTypes.arrayOf(PropTypes.string)
+    })
+  ).isRequired
 };

@@ -29,9 +29,6 @@ const HomePage = () => (
       <Algo />
     </Suspense>
     <Suspense fallback={<LoadingFallback />}>
-      <Limitations />
-    </Suspense>
-    <Suspense fallback={<LoadingFallback />}>
       <Experiences />
     </Suspense>
     <Suspense fallback={<LoadingFallback />}>

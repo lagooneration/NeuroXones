@@ -95,30 +95,30 @@ export const mySocials = [
 
 export const experiences = [
   {
-    title: "Primary Research",
-    job: "Understanding Auditory Attention",
-    date: "2021-2022",
+    title: "",
+    job: "Attention Decoding",
+    date: "Limitations",
     contents: [
-      "Inspired by research done by Bertrand A, KU Leuven on auditory attention and mechanisms responsible for neuro-steered attention detection.",
-  ],
-  },
-  {
-    title: "Conceptualization",
-    job: "Neuro-Steered Device",
-    date: "2022-2024",
-    contents: [
-      "Conceptualized a prototype for neuro-steered EEG extension, starting with auditory attention detection.",
-      "Prototyping plan and research for suitable equipment and hardware for EEG extension compatible with AR/VR devices.",
+      "Current AAD models require a 'decision window' of 1-2 seconds to detect attention shifts, creating a noticeable lag in real-world applications.",
+      "visualizer: true",
     ],
   },
   {
-    title: "Algorithm Development",
-    job: "Auditory Attention Detection",
-    date: "2024-Present",
+    title: "",
+    job: "Audio Source Separation",
+    date: "Real-Time",
     contents: [
-      "Developing algorithms to detect auditory attention using EEG data.",
-      "Implementing machine learning techniques to improve accuracy and responsiveness.",
-      "Collaborating with researchers to validate and refine the detection algorithms.",
+      "Recent studies suggest that integrating neural signals with speech enhancement algorithms represents a promising research direction.",
+      "youtubeUrl: https://www.youtube.com/embed/_wPZ2l12C-o",
+    ],
+  },
+  {
+    title: "",
+    job: "Prototype Development",
+    date: "High Fidelity EEG",
+    contents: [
+      "A Framework for High-Density, Synchronized EEG and Multi-Speaker Audio Data Collection for Modeling Auditory Attention.",
+      "To create a large-scale, high-quality, open-source dataset that is purpose-built for training and validating next-generation AAD algorithms.",
     ],
   },
 ];
@@ -144,7 +144,7 @@ export const reviews = [
   {
     name: "Patents & IP",
     username: "@Legal",
-    body: "Patenting the neuro-steered plugon design and technology with AR/VR consoles.",
+    body: "Patenting the neuro-steered design and technology compatible with headphones and AR/VR headsets.",
     img: "/assets/logos/patent.svg",
   },
   {
