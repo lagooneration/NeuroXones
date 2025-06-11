@@ -83,7 +83,7 @@ const AudioExperience = () => {
   return (
     <ErrorBoundary>
       <section className="h-screen overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800">
-        <div className="absolute top-12 left-4 z-10">
+        <div className="absolute top-16 left-4 z-10">
           <Link
             to="/"
             className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900/50 backdrop-blur-sm rounded-lg text-white hover:bg-gray-800 transition-all"

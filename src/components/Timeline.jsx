@@ -33,14 +33,12 @@ export const Timeline = ({ data }) => {
           <h4 className="text-sm font-semibold text-white mb-2">Attention Switching Lag:</h4>
           <AttentionLagVisualizer />
           <p className="text-xs text-gray-400 text-center italic mt-2">
-            The brain's focus changes (outer ring) before the actual neural response (inner color) due to the ~1.5 second lag
-            required by current AAD algorithms to detect attention.
+            ~1.5s lag for attention decoding by current AAD models
           </p>
         </div>
       );
     }
-    
-    // Check if this is a YouTube URL directive
+      // Check if this is a YouTube URL directive
     if (content.startsWith("youtubeUrl:")) {
       const youtubeUrl = content.substring("youtubeUrl:".length).trim();
       return (
@@ -53,6 +51,20 @@ export const Timeline = ({ data }) => {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
+        </div>
+      );
+    }
+    
+    // Check if this is an image directive
+    if (content.startsWith("imagePath:")) {
+      const imagePath = content.substring("imagePath:".length).trim();
+      return (
+        <div className="w-full overflow-hidden rounded-lg mb-6">
+          <img 
+            src={imagePath}
+            alt="Project illustration"
+            className="w-full h-auto object-contain"
+          />
         </div>
       );
     }

@@ -61,6 +61,7 @@ NeuroXones is an advanced brain-computer interface (BCI) platform that integrate
 - An Animated Cat: [https://skfb.ly/6YPwH] by Evil_Katz is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
 - Sound Effect by [https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=47157] freesound_community from [https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=47157] Pixabay
 - Neural Interface by [OpenTechLab](https://www.printables.com/@OpenTechLab_85377)
+- Music by [https://pixabay.com/users/lofidreams99-25132446/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=344112] kaveesha Senanayake from [https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=344112] Pixabay
 
  ## Inspiration 
  *   [Ali-Sanati/Portfolio](https://github.com/Ali-Sanati/Portfolio) - Inspiration for the structure of the page.

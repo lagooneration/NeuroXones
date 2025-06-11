@@ -68,34 +68,45 @@ const AudioVisualizer = ({ activeAudioSource, audioRefs }) => {
       
       // Draw visualization bars
       const barWidth = (canvas.width / bufferLength) * 2.5;
-      let x = 0;
-        // Choose color based on active source
+            let x = 0;
+      
+      // Choose color based on active source
       let barColor;
+      let pulseFactor = 1.0; // Add pulse factor for more dynamic visualization
+      
       switch (activeAudioSource.toLowerCase()) {
         case 'birds':
-          barColor = 'rgba(255, 212, 59, 0.8)'; // Yellow for birds
+          barColor = 'rgba(255, 212, 59, 0.9)'; // Yellow for birds - increased opacity
           break;
         case 'cat':
-          barColor = 'rgba(255, 107, 107, 0.8)'; // Red for cat
+          barColor = 'rgba(255, 107, 107, 0.9)'; // Red for cat - increased opacity
           break;
-        case 'sign':
-          barColor = 'rgba(77, 171, 247, 0.8)'; // Blue for sign
+        case 'player':
+          barColor = 'rgba(77, 171, 247, 0.9)'; // Blue for player - increased opacity
           break;
         default:
-          barColor = 'rgba(255, 255, 255, 0.8)';
+          barColor = 'rgba(255, 255, 255, 0.9)';
       }
       
-      // Draw each bar
+      // Add time-based pulse effect
+      pulseFactor = 1.0 + 0.2 * Math.sin(Date.now() * 0.003);
+      
+      // Draw each bar with enhanced effects
       for (let i = 0; i < bufferLength; i++) {
-        const barHeight = (dataArray[i] / 255) * canvas.height;
+        // Apply some frequency-based effects to make visualization more interesting
+        const frequencyFactor = i / bufferLength; // 0-1 range from low to high frequency
+        const barHeight = (dataArray[i] / 255) * canvas.height * pulseFactor;
         
-        // Use a gradient for the bars
+        // Use a more vibrant gradient for the bars
         const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
-        gradient.addColorStop(0, 'rgba(0, 0, 0, 0.2)');
-        gradient.addColorStop(1, barColor);
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
+        gradient.addColorStop(0.6, barColor);
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.8)');
         
         ctx.fillStyle = gradient;
-        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+        // Add some variation to bar width based on frequency
+        const currentBarWidth = barWidth * (1 + 0.2 * frequencyFactor);
+        ctx.fillRect(x, canvas.height - barHeight, currentBarWidth, barHeight);
         
         x += barWidth + 1;
       }
@@ -114,12 +125,17 @@ const AudioVisualizer = ({ activeAudioSource, audioRefs }) => {
         animationRef.current = null;
       }
     };
-  }, [activeAudioSource, audioRefs]);
-    return (
-    <div className={`absolute bottom-4 left-4 right-4 h-16 sm:h-20 md:h-24 bg-black bg-opacity-30 backdrop-blur-sm rounded-xl overflow-hidden transition-all duration-500 shadow-lg ${activeAudioSource ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'}`}>
+  }, [activeAudioSource, audioRefs]);    return (
+    <div className={`absolute bottom-4 left-4 right-4 h-16 sm:h-20 md:h-24 bg-black bg-opacity-30 backdrop-blur-sm rounded-xl overflow-hidden transition-all duration-500 shadow-lg ${activeAudioSource ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-8'}`} style={{ 
+      boxShadow: activeAudioSource ? 
+        (activeAudioSource.toLowerCase() === 'birds' ? '0 0 15px 5px rgba(255, 212, 59, 0.3)' : 
+         activeAudioSource.toLowerCase() === 'cat' ? '0 0 15px 5px rgba(255, 107, 107, 0.3)' : 
+         activeAudioSource.toLowerCase() === 'player' ? '0 0 15px 5px rgba(77, 171, 247, 0.3)' : 
+         '0 0 15px 5px rgba(255, 255, 255, 0.3)') : 'none' 
+    }}>
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className={`text-xs sm:text-sm font-medium text-white opacity-50 ${activeAudioSource ? '' : 'hidden'}`}>
-          {activeAudioSource ? `Visualizing ${activeAudioSource}` : ''}
+        <div className={`text-xs sm:text-sm font-medium text-white opacity-70 ${activeAudioSource ? '' : 'hidden'}`}>
+          {activeAudioSource ? `Focused Audio: ${activeAudioSource}` : ''}
         </div>
       </div>
       <canvas 

@@ -10,7 +10,6 @@ const Contact = lazy(() => import("./sections/Contact"));
 const Footer = lazy(() => import('./sections/Footer'));
 const AudioExperience = lazy(() => import('./sections/AudioExperience'));
 const Algo = lazy(() => import('./sections/Algo'));
-const Limitations = lazy(() => import('./sections/Limitations'));
 
 // Loading fallback
 const LoadingFallback = () => (

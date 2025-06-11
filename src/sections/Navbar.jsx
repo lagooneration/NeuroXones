@@ -20,7 +20,7 @@ function Navigation({ isMobile }) {
         <a className={`nav-link ${isMobile ? "text-xl text-white/80 hover:text-white" : ""}`} href="#about">
           About
         </a>
-      </li>      <li className={`nav-li ${isMobile ? "flex justify-center mt-6" : ""}`}>
+      </li>      <li className={`nav-li ${isMobile ? "flex justify-center" : ""}`}>
         <a className={`nav-link ${isMobile ? "flex justify-center w-full" : ""}`} href="#contact">
           <ContactButton className={isMobile ? "mx-auto" : ""} />
         </a>

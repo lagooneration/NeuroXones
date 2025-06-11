@@ -18,29 +18,14 @@ const About = () => {  const grid2Container = useRef();
             alt="Headphone visualization"
           />
           <div className="z-10">
-            <p className="headtext">Move beyond passive listening</p>
+            <p className="headtext">Headphone Integration</p>
             <p className="subtext">
-              Actively identifying your attentional focus and dynamically enhancing the audio in real-time, precisely as per the user's conscious intent
+              Move beyond passive listening, choosing your own soundscapes
               </p>
           </div>
           <div className="absolute inset-x-0 pointer-evets-none -bottom-4 h-1/2 sm:h-1/3 bg-gradient-to-t from-indigo" />
         </div>
         {/* Grid 2 */}
-        <div className="grid-default-color grid-2">        
-        <div
-            ref={grid2Container}
-            className="flex items-center justify-center w-full h-full rounded-[24px] relative overflow-hidden"
-          >            <LazyImage
-            src="images/vr.png"
-            className="absolute z-0 -top-[30px]"
-            alt="VR headset visualization"
-          />
-          <div className="z-10">
-            <p className="absolute left-4 bottom-0 headtext">AR/VR Integration</p>
-          </div>
-        </div>
-
-        </div>        {/* Grid 3 */}
         <div className="grid-black-color grid-3 relative overflow-hidden"> 
           <div
             ref={grid3Container}
@@ -54,13 +39,32 @@ const About = () => {  const grid2Container = useRef();
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
             <div className="z-10 p-4 absolute inset-0 flex flex-col justify-end md:justify-center">
               <div className="w-full md:max-w-[80%]">
-                <p className="headtext text-white md:text-black text-2xl md:text-3xl font-bold mb-2">Temporal Response Fn</p>
-                <p className="text-gray-800 md:text-black/80 text-sm md:text-base">
-                  (TRF) facilitates a mapping b/w features of sound & EEG responses
+                <p className="headtext text-white md:text-white text-2xl md:text-3xl font-bold mb-2">Temporal Response Mapping</p>
+                <p className="text-gray-300 md:text-gray/90 text-sm md:text-base">
+                  Machine learning models trained on your EEG responses, enhancing your listening experience.
                 </p>
               </div>
             </div>
           </div>
+        </div>
+        
+                
+        {/* Grid 3 */}
+        <div className="grid-default-color grid-2">        
+        <div
+            ref={grid2Container}
+            className="flex items-center justify-center w-full h-full rounded-[24px] relative overflow-hidden"
+          >            
+          <LazyImage
+            src="images/vr.png"
+            className="absolute z-0 -top-[30px]"
+            alt="VR headset visualization"
+          />
+          <div className="z-10">
+            <p className="absolute left-4 bottom-0 headtext">AR/VR Integration</p>
+          </div>
+        </div>
+
         </div>
         {/* Grid 4 */}
         <div className="grid-special-color grid-4">
@@ -69,9 +73,9 @@ const About = () => {  const grid2Container = useRef();
               Experience Neuro-Steered listening?
             </p>
             <SimButton />
-
           </div>
-        </div>        {/* Grid 5 */}
+        </div>        
+        {/* Grid 5 */}
         <div className="grid-default-color grid-5">
            <div
             ref={grid5Container}
@@ -79,7 +83,7 @@ const About = () => {  const grid2Container = useRef();
           >
           <LazyImage
             src="assets/ci.png"
-            className="absolute z-0 -top-[80px]"
+            className="absolute z-0 -top-[40px] md:-top-[170px]"
             alt="Cochlear Implant visualization"
           />
           <div className="z-10">

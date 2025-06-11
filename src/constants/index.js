@@ -99,7 +99,7 @@ export const experiences = [
     job: "Attention Decoding",
     date: "Limitations",
     contents: [
-      "Current AAD models require a 'decision window' of 1-2 seconds to detect attention shifts, creating a noticeable lag in real-world applications.",
+      "A 'decision window' of 1-2 seconds to detect attention shifts, creating a noticeable lag in real-world applications.",
       "visualizer: true",
     ],
   },
@@ -111,14 +111,14 @@ export const experiences = [
       "Recent studies suggest that integrating neural signals with speech enhancement algorithms represents a promising research direction.",
       "youtubeUrl: https://www.youtube.com/embed/_wPZ2l12C-o",
     ],
-  },
-  {
+  },  {
     title: "",
-    job: "Prototype Development",
-    date: "High Fidelity EEG",
+    job: "Capture it!",
+    date: "Don't just remove noise",
     contents: [
-      "A Framework for High-Density, Synchronized EEG and Multi-Speaker Audio Data Collection for Modeling Auditory Attention.",
-      "To create a large-scale, high-quality, open-source dataset that is purpose-built for training and validating next-generation AAD algorithms.",
+      "Investigating the feasibility & performance of a predictive learning framework for real-time cancellation of physiological artifacts in EEG signals.",
+      "Finding ways to capture clean EEG signals to train mapping of temporal response machine learning model.",
+      "imagePath: /assets/hp.png",
     ],
   },
 ];
