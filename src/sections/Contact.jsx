@@ -58,7 +58,7 @@ const Contact = () => {
     <section id="contact" className="relative flex items-center c-space section-spacing">
       {/* Background grid image */}
       <div className="absolute inset-0 w-full h-full z-0">
-        <img src="/assets/grid.png" alt="Grid Background" className="object-cover w-full h-full opacity-30" />
+        <img src="/assets/grid.png" alt="Grid Background" className="object-cover w-full h-full opacity-90" />
       </div>
       {showAlert && <Alert type={alertType} text={alertMessage} />}
       <div className="flex flex-col items-center justify-center max-w-md p-5 mx-auto border border-white/10 rounded-2xl bg-primary relative z-10">

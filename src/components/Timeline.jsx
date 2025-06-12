@@ -63,7 +63,7 @@ export const Timeline = ({ data }) => {
           <img 
             src={imagePath}
             alt="Timeline"
-            className="w-full h-auto object-contain"
+            className="w-full h-auto object-contain rounded-lg"
             title="RnD"
           />
         </div>

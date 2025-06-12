@@ -31,7 +31,7 @@ const DemcusAnimation = () => {
       {/* Original mixed sound waves */}
       <div className="w-full h-12 relative mb-6">
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
-          <div className="text-xs text-white opacity-50 absolute left-2">Mixed Audio</div>
+          <div className="text-xs text-white opacity-50 absolute left-4">Mixed Audio</div>
           {audioWaves.map((wave) => (
             <motion.svg 
               key={wave.id} 

@@ -13,7 +13,8 @@ const LazyImage = memo(({
   ...props 
 }) => {
   return (
-    <img      src={src}
+    <img      
+    src={src}
       alt={alt || ''}
       className={className}
       style={{

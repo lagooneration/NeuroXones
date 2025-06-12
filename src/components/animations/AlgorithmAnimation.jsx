@@ -51,7 +51,7 @@ const AlgorithmAnimation = ({ algorithmId, shouldPlay = true }) => {
   };
 
   return (
-    <div className="w-full h-52 bg-[#030412] rounded-md overflow-hidden">
+    <div className="w-full h-52 p-2 bg-[#06061b] rounded-md overflow-hidden">
       {getAnimationComponent()}
     </div>
   );
