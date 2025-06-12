@@ -1,10 +1,14 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { 
   Environment, 
   OrbitControls,
-  Sky
+  Sky,
+  useProgress,
+  Html,
+  useGLTF
 } from '@react-three/drei';
+import * as THREE from 'three';
 import PropTypes from 'prop-types';
 
 // Import the 3D models
@@ -26,25 +30,89 @@ const AUDIO_FILES = {
   player: '/audio/player.mp3'
 };
 
+// Loading indicator component
+function Loader() {
+  const { progress } = useProgress();
+  return (
+    <Html center>
+      <div className="loader-container">
+        <div className="loader"></div>
+        <div className="loading-text">{progress.toFixed(0)}% loaded</div>
+      </div>
+    </Html>
+  );
+}
+
+// Preload all models to prevent context loss
+useGLTF.preload('/models/player.glb');
+useGLTF.preload('/models/cat.glb');
+useGLTF.preload('/models/bird.glb');
+
 // Main 3D Scene component
 function Scene({ activeModel }) {
-  const { camera } = useThree();
+  const { camera, gl, scene } = useThree();
   
   useEffect(() => {
     // Position the camera for a good view of all models
     camera.position.set(0, 2, 8);
     camera.lookAt(0, 0, 0);
-  }, [camera]);
 
-  return (    <>      
-    {/* Better background alternative to HDR */}
+    // Enable shadow mapping
+    gl.shadowMap.enabled = true;
+    gl.shadowMap.type = THREE.PCFSoftShadowMap;
+    
+    // Set pixel ratio to avoid performance issues
+    gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    
+    // Optimize renderer
+    gl.setSize(gl.domElement.clientWidth, gl.domElement.clientHeight);
+    
+    // Limit frame rate to 60 fps to avoid overloading the GPU
+    const clock = new THREE.Clock();
+    const limitFramerate = () => {
+      const delta = clock.getDelta();
+      if (delta < 1/60) {
+        setTimeout(() => {
+          requestAnimationFrame(limitFramerate);
+        }, (1/60 - delta) * 1000);
+      } else {
+        requestAnimationFrame(limitFramerate);
+      }
+    };
+    limitFramerate();
+
+    // Ensure proper cleanup
+    return () => {
+      // Dispose of any materials, geometries, or textures if needed
+      scene.traverse((object) => {
+        if (object.material) {
+          if (Array.isArray(object.material)) {
+            object.material.forEach(m => m.dispose());
+          } else {
+            object.material.dispose();
+          }
+        }
+        if (object.geometry) {
+          object.geometry.dispose();
+        }
+        if (object.texture) {
+          object.texture.dispose();
+        }
+      });
+    };
+  }, [camera, gl, scene]);
+
+  return (    
+  <>      
+  {/* Better background alternative to HDR */}
       {/* <color attach="background" args={['#87CEEB']} /> */}
       {/* <Sky sunPosition={[10, 5, 0]} /> */}
-      <Environment 
-          files="/assets/env/japa.jpg" 
-          background
-          blur={0.5}
-          />
+      {/* <Environment preset="park" background={false} /> */}
+      <Environment
+        files="/assets/env/japan.jpg"
+        background
+        blur={0.03}
+        />
       {/* Add lighting for better visibility */}
       <ambientLight intensity={0.5} />
       <directionalLight position={[10, 10, 5]} intensity={1} />
@@ -53,18 +121,21 @@ function Scene({ activeModel }) {
       <group>
         {/* Position the models in a semi-circle */}
         <Player 
-          position={[0, 0, 0]} 
-          scale={1} 
+          position={[7.6, -3, -12]}
+          rotation={[0, -Math.PI / 4, 0]} 
+          scale={10} 
           visible={true}
         />
         <Cat 
-          position={[-3, 0, 0]} 
-          scale={0.5} 
+          position={[-4, -0.8, -4]} 
+          rotation={[0, -Math.PI / 12, 0]} 
+          scale={0.08} 
           visible={true}
         />
         <Bird 
-          position={[3, 0, 0]} 
-          scale={0.5} 
+          position={[1.5, 0, 4.2]} 
+          rotation={[0, -Math.PI / 6, 0]} 
+          scale={4} 
           visible={true}
         />
       </group>
@@ -225,6 +296,7 @@ AudioController.propTypes = {
 const ParkScene = () => {
   const [activeModel, setActiveModel] = useState(null);
   const [audioContextInitialized, setAudioContextInitialized] = useState(false);
+  const [canvasError, setCanvasError] = useState(false);
   
   // Function to handle user interaction for audio context initialization
   const handleUserInteraction = () => {
@@ -233,18 +305,46 @@ const ParkScene = () => {
     }
   };
 
+  // Handle canvas errors
+  const handleCanvasError = useCallback((error) => {
+    console.error("Canvas error:", error);
+    setCanvasError(true);
+  }, []);
+
   return (
     <div 
       className="park-scene-container" 
       onClick={handleUserInteraction}
     >
       <h2>Selective Listening Experience</h2>
-      <p>Hover over an icon below to enhance its audio - simulating selective listening</p>
-      
-      <div className="canvas-container">
-        <Canvas>
-          <Scene activeModel={activeModel} />
-        </Canvas>      </div>
+      <p>Hover over an icon below to enhance its audio - simulating selective listening</p>      <div className="canvas-container">
+        <Canvas
+          gl={{ 
+            antialias: true,
+            preserveDrawingBuffer: true,
+            alpha: true,
+            powerPreference: 'high-performance'
+          }}
+          camera={{ position: [2, 2, 10], fov: 45 }}
+          dpr={[1, 2]}
+          style={{ background: 'transparent' }}          shadows
+          onCreated={({ gl }) => {
+            gl.setClearColor(new THREE.Color('#87CEEB'), 0);
+            // Only add event listener if canvas is available
+            if (gl.domElement) {
+              gl.domElement.addEventListener('webglcontextlost', (e) => {
+                e.preventDefault();
+                console.log('WebGL context lost. Trying to restore...');
+                // You could add additional handling here
+              });
+            }
+          }}
+        >
+          <Suspense fallback={<Loader />}>
+            <Scene activeModel={activeModel} />
+          </Suspense>
+        </Canvas>
+      </div>
       
       <Trackpad activeModel={activeModel} setActiveModel={setActiveModel} />
       <AudioController activeModel={activeModel} initializedByUser={audioContextInitialized} />
@@ -258,6 +358,7 @@ const ParkScene = () => {
           padding: 2rem;
           color: white;
           text-align: center;
+          margin-top: 1.2rem;
         }
         
         h2 {
@@ -335,10 +436,37 @@ const ParkScene = () => {
           cursor: pointer;
           transition: all 0.3s ease;
         }
-        
-        .audio-init-button:hover {
+          .audio-init-button:hover {
           background: #3a78ff;
           transform: scale(1.05);
+        }
+        
+        .loader-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .loader {
+          border: 5px solid rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          border-top: 5px solid #4a88ff;
+          width: 50px;
+          height: 50px;
+          animation: spin 1s linear infinite;
+          margin-bottom: 10px;
+        }
+        
+        .loading-text {
+          color: white;
+          font-size: 16px;
+          text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </div>
