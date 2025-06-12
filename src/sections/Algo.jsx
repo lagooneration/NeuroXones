@@ -4,6 +4,7 @@ import { FaFacebook } from "react-icons/fa";
 import { CiWavePulse1 } from "react-icons/ci";
 import { LuBrainCircuit } from "react-icons/lu";
 import { IoGitNetworkSharp } from "react-icons/io5";
+import { motion } from 'framer-motion';
 // Lazy load the animation component
 const AlgorithmAnimation = lazy(() => import('../components/animations/AlgorithmAnimation'));
 
@@ -43,21 +44,25 @@ AlgorithmButton.displayName = 'AlgorithmButton';
 const AlgorithmDetails = memo(({ details }) => (
   <div className="w-full bg-[#0a0b1a] border border-[#1a1a2e] rounded-xl p-6 md:p-8 shadow-xl">
     <h3 className="text-xl md:text-2xl font-bold mt-2 text-white text-start md:text-left">
-      {details.title}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        key={details.title} // Important: key changes trigger animation to re-run
+      >
+        {details.title}
+      </motion.div>
     </h3>
     <p className="text-gray-300 mb-6 leading-relaxed text-start md:text-left">
-      {details.description}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+        key={details.description} // Important: key changes trigger animation to re-run
+      >
+        {details.description}
+      </motion.div>
     </p>
-    
-    {/* <h4 className="text-lg md:text-xl font-semibold mb-3 text-white text-center md:text-left">Key Benefits:</h4>
-    <ul className="space-y-2">
-      {details.benefits.map((benefit, index) => (
-        <li key={index} className="flex items-start">
-          <span className="text-[#3a29ff] mr-2 flex-shrink-0">•</span>
-          <span className="text-gray-300">{benefit}</span>
-        </li>
-      ))}
-    </ul> */}
   </div>
 ));
 
@@ -84,7 +89,6 @@ const Algo = () => {
             icon: <FaFacebook />,
             fullTitle: "Advanced Audio Separation",
             fullDescription: "Demucs is a state-of-the-art hybrid model from facebook combining waveform and spectrogram domain separation, achieving 9.0 dB SDR on benchmark datasets. Originally developed by Facebook Research for music source separation, we've adapted it for selective auditory stream isolation in complex acoustic environments.",
-            benefits: ["Separates overlapping sounds with up to 9.0 dB Signal-to-Distortion Ratio", "Processes both time and frequency domains for superior separation quality", "Optimized for real-time performance on embedded neural hardware"]
         },
         {
             id: 2,
@@ -94,7 +98,6 @@ const Algo = () => {
             icon: <CiWavePulse1 />,
             fullTitle: "End-to-End Speech Separation",
             fullDescription: "ConvTasNet is a fully-convolutional time-domain audio separation network that outperforms traditional spectrogram-based methods. It works directly on waveforms using a learnable encoder-decoder architecture with temporal convolutional networks (TCN).",
-            benefits: ["Processes raw waveforms without spectrogram conversion for lower latency", "Achieves over 15 dB improvement in speech separation quality", "Maintains voice characteristics essential for natural listening experience"]
         },
         {
             id: 3,
@@ -104,7 +107,6 @@ const Algo = () => {
             icon: <LuBrainCircuit />,
             fullTitle: "Neural Decoding of Attention",
             fullDescription: "AAD algorithm decodes neural signals to determine which speaker or sound source has captured attention in multi-talker environments. By correlating EEG readings with speech envelope features, it can identify the attended speaker with up to 95% accuracy.",
-            benefits: ["Decodes attention targets from non-invasive EEG with >90% accuracy", "Adapts to individual neural patterns through personalized calibration", "Responds to attention shifts within 200-300ms, faster than conscious perception"]
         },
         {
             id: 4,
@@ -114,7 +116,6 @@ const Algo = () => {
             icon: <IoGitNetworkSharp />,
             fullTitle: "Long Sequence Modeling",
             fullDescription: "DPRNN addresses the challenge of modeling extremely long audio sequences by dividing the problem into two paths: local and global processing. This architecture efficiently captures both short-term acoustic features and long-term temporal dependencies crucial for speaker tracking.",
-            benefits: ["Reduces computational complexity by up to 70% compared to traditional RNNs", "Maintains contextual awareness across minutes of audio", "Enables efficient training on limited data, critical for personalization"]
         }
     ], []);
 
