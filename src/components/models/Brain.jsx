@@ -16,6 +16,7 @@ const vertexShader = `
   varying float vDistance;
   varying float vNeuralActivity;
   varying vec3 vNormal;
+  varying float vParticleEffect;
 
   void main() {
     vPosition = position;
@@ -30,14 +31,19 @@ const vertexShader = `
     float maxDist = 0.7;
     float extrudeAmount = smoothstep(maxDist, 0.0, dist) * 0.01;
     
-    // Add subtle wave motion to the extrusion
-    float wave = sin(position.x * 8.0 + position.y * 8.0 + position.z * 8.0 + time * 3.0) * 0.2;
-    extrudeAmount *= (1.0 + wave * smoothstep(maxDist, 0.0, dist));
     
-    // Calculate neural activity value for fragment shader
-    // This simulates pulses moving along the network
-    vNeuralActivity = sin(position.x * 10.0 + position.y * 8.0 + position.z * 6.0 - time * 5.0) * 0.5 + 0.5;
-    vNeuralActivity *= smoothstep(maxDist, 0.0, dist) * 0.8 + 0.2;
+  // Calculate particle flow effect for neurons - only active on hover
+    float particleFlow = 0.0;
+    if (dist < maxDist * 0.8) { // Increased detection radius
+      // Create directional flow effect based on normal direction
+      particleFlow = fract(dot(normal, vec3(1.0, 0.5, 0.8)) * 1.5 - time * 2.5); // Adjusted frequency
+      // Make sure effect is stronger closer to mouse position
+      particleFlow *= smoothstep(maxDist * 0.8, 0.0, dist) * 1.5; // Stronger effect
+    }
+    vParticleEffect = particleFlow;
+    
+    // Neural activity now focuses on hover area rather than pulsating everywhere
+    vNeuralActivity = smoothstep(maxDist, 0.0, dist);
     
     // Extrude along normal with smoothed effect
     vec3 newPosition = position + normal * extrudeAmount;
@@ -52,6 +58,7 @@ const fragmentShader = `
   varying float vDistance;
   varying float vNeuralActivity;
   varying vec3 vNormal;
+  varying float vParticleEffect;
 
   vec3 pulseColor(float t) {
     // Gradient from electric blue to cyan to white
@@ -65,31 +72,61 @@ const fragmentShader = `
       return mix(color2, color3, (t - 0.5) * 2.0);
     }
   }
+    // Function to create neuron particle effect
+  vec3 neuronParticles(vec3 baseColor, float particleEffect, float distance) {
+    // Bright white-blue color for particles - more vibrant
+    vec3 particleColor = vec3(1.0, 1.0, 1.0);  // Pure white for more contrast
+    
+    // Create flowing particle effect - increased detection threshold
+    float particleIntensity = step(0.65, particleEffect) * step(distance, 0.25); // Larger radius and more frequent
+    
+    // Add bright spots for neuron endpoints
+    if (particleIntensity > 0.0) {
+      // Make particles brighter at certain points for a "flying out" effect - more pronounced transition
+      float particleBrightness = smoothstep(0.65, 0.9, particleEffect) * 1.5; // Increased brightness
+      return mix(baseColor, particleColor, clamp(particleBrightness, 0.0, 1.0)); // Clamped to avoid oversaturation
+    }
+    
+    return baseColor;
+  }
 
   void main() {
     // Base color (transparent blue)
     vec3 baseColor = vec3(0.25, 0.52, 0.95);
     
-    // Dynamic colors for neural activity effect
-    vec3 pulseColors = pulseColor(vNeuralActivity);
-    
-    // Mix colors based on distance and neural activity
+    // Distance effect for hover
     float maxDist = 0.3;
     float colorMix = smoothstep(maxDist, 0.0, vDistance);
     
-    // Create moving wave patterns along the wireframe
-    float wave = sin(vPosition.x * 15.0 + vPosition.y * 10.0 + vPosition.z * 12.0 - time * 4.0) * 0.5 + 0.5;
-    wave *= smoothstep(maxDist, 0.0, vDistance);
+    // Dynamic colors for neural activity effect - only on hover
+    vec3 activeColor = pulseColor(vNeuralActivity);
     
-    // Combine effects for final color
-    vec3 finalColor = mix(baseColor, pulseColors, colorMix * (0.7 + 0.3 * wave));
+    // Create flowing effect along the wireframe on hover
+    float flowEffect = smoothstep(0.0, 1.0, sin(vPosition.x * 8.0 + vPosition.y * 6.0 + vPosition.z * 10.0 + time * 3.0) * 0.5 + 0.5);
+    flowEffect *= colorMix; // Only flow on hover
     
-    // Add subtle glow for excited neural pathways
-    float glowIntensity = smoothstep(0.3, 0.8, vNeuralActivity) * colorMix;
-    finalColor += vec3(0.1, 0.5, 0.9) * glowIntensity;
+    // Combine base color with hover-activated color
+    vec3 finalColor = mix(baseColor, activeColor, colorMix * flowEffect);
     
-    // Opacity transition (more visible when active)
-    float opacity = mix(0.05, 0.4, colorMix * (0.8 + 0.2 * vNeuralActivity));
+    // Add neuron particle effect on hover
+    finalColor = neuronParticles(finalColor, vParticleEffect, vDistance);
+    
+    // Add directional glow based on normal direction for 3D effect
+    float normalGlow = abs(dot(normalize(vNormal), vec3(0.0, 1.0, 0.5)));
+    finalColor += vec3(0.0, 0.3, 0.6) * normalGlow * colorMix * 0.3;
+      // Opacity transition (more visible when active)
+    float opacity = mix(0.05, 0.6, colorMix); // Increased maximum opacity
+    
+    // Brighter particles at endpoints for "flying out" effect - more dramatic
+    if (vParticleEffect > 0.7 && vDistance < 0.2) { // Lower threshold, larger area
+      // Create more intense "flying" particles
+      float particleGlow = pow(vParticleEffect, 2.0) * (1.0 - vDistance * 4.0);
+      particleGlow = clamp(particleGlow, 0.0, 1.0);
+      
+      // Add extra brightness boost for dramatic effect
+      finalColor = mix(finalColor, vec3(1.0, 1.0, 1.0), particleGlow * 0.9); // Increased mix factor
+      opacity = mix(opacity, 1.0, particleGlow * 0.8); // More visible particles
+    }
     
     gl_FragColor = vec4(finalColor, opacity);
   }
