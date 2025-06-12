@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { lazy, Suspense, useState, useEffect } from 'react';
+import { Grid } from 'ldrs/react';
+import 'ldrs/react/Grid.css';
 import Navbar from "./sections/Navbar";
 import Hero from "./sections/Hero";
 
@@ -16,9 +18,13 @@ const Algo = lazy(() => import('./sections/Algo'));
 const AppLoadingScreen = () => (
   <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
     <div className="text-center">
-      <div className="w-16 h-16 border-4 border-t-4 rounded-full border-neutral-700 border-t-indigo-500 animate-spin mb-4 mx-auto"></div>
+      <Grid
+        size={60}
+        speed={1.5}
+        color="rgb(99, 102, 241)"
+        className="mb-4 mx-auto"
+      />
       <h2 className="text-white text-xl font-bold">NeuroXones</h2>
-      <p className="text-gray-400 mt-2">Loading experience...</p>
     </div>
   </div>
 );
@@ -52,6 +58,21 @@ const HomePage = () => (
 );
 
 const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    // Simulate initial loading delay or check for assets loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  if (isLoading) {
+    return <AppLoadingScreen />;
+  }
+  
   return (
     <Router>
       <div className="container mx-auto max-w-7xl">

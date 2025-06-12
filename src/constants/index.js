@@ -117,7 +117,7 @@ export const experiences = [
     date: "Don't just remove noise",
     contents: [
       "Investigating the feasibility & performance to capture clean EEG signals using physiological artifacts prediction learning framework for real-time EEG noise cancellation.",
-      "imagePath: /assets/hp.png",
+      "imagePath: /assets/images/hp.png",
     ],
   },
 ];

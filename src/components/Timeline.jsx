@@ -75,8 +75,8 @@ export const Timeline = ({ data }) => {
 
   return (
     <div className="c-space section-spacing" ref={containerRef}>
-      <h2 className="text-heading text-center">Research & Development</h2>
-      <div ref={ref} className="relative pb-20">
+      <h2 className="text-4xl text-center lg:text-6xl font-bold">Research & Development</h2>
+      <div ref={ref} className="relative pb-10">
         {data.map((item, index) => (
           <div
             key={index}

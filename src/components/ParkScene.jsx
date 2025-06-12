@@ -183,6 +183,7 @@ Trackpad.propTypes = {
 // Audio Controller component
 function AudioController({ activeModel, initializedByUser }) {
   const [audioInitialized, setAudioInitialized] = useState(false);
+  const [showStartButton, setShowStartButton] = useState(false);
   const audioRefs = useRef({
     cat: new Audio(AUDIO_FILES.cat),
     bird: new Audio(AUDIO_FILES.bird),
@@ -205,8 +206,14 @@ function AudioController({ activeModel, initializedByUser }) {
     // Set traffic volume to 30%
     audios.traffic.volume = 0.2;
     
+    // Show start button after a short delay to ensure page has loaded
+    const timer = setTimeout(() => {
+      setShowStartButton(true);
+    }, 800);
+    
     // Cleanup function
     return () => {
+      clearTimeout(timer);
       Object.values(audios).forEach(audio => {
         audio.pause();
         audio.currentTime = 0;
@@ -230,12 +237,14 @@ function AudioController({ activeModel, initializedByUser }) {
       .then(() => setAudioInitialized(true))
       .catch(err => console.error("Could not initialize audio:", err));
   }, [audioInitialized]);
-    // Try to initialize audio when initializedByUser changes to true
+  // Try to initialize audio when initializedByUser changes to true
   useEffect(() => {
     if (initializedByUser && !audioInitialized) {
       initializeAudio();
     }
-  }, [initializedByUser, audioInitialized, initializeAudio]);  useEffect(() => {
+  }, [initializedByUser, audioInitialized, initializeAudio]);  
+
+  useEffect(() => {
     if (!audioInitialized) return;
     
     // Store a reference to audioRefs.current to use in effect and cleanup
@@ -280,7 +289,10 @@ function AudioController({ activeModel, initializedByUser }) {
     <>
       {!audioInitialized && (
         <div className="audio-init-overlay" onClick={initializeAudio}>
-          <button className="audio-init-button">
+          <button 
+            className={`audio-init-button ${showStartButton ? 'fade-in' : 'invisible'}`}
+            disabled={!showStartButton}
+          >
             Start 
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fillRule="evenodd" clipRule="evenodd" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM10.6935 15.8458L15.4137 13.059C16.1954 12.5974 16.1954 11.4026 15.4137 10.941L10.6935 8.15419C9.93371 7.70561 9 8.28947 9 9.21316V14.7868C9 15.7105 9.93371 16.2944 10.6935 15.8458Z" fill="#1C274C"></path> </g></svg>
           </button>
@@ -439,8 +451,30 @@ const ParkScene = () => {
           font-size: 1.2rem;
           cursor: pointer;
           transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
         }
-          .audio-init-button:hover {
+
+        .audio-init-button.invisible {
+          opacity: 0;
+        }
+
+        .audio-init-button.fade-in {
+          opacity: 1;
+          animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .audio-init-button:disabled {
+          cursor: default;
+        }
+
+        .audio-init-button svg {
+          width: 20px;
+          height: 20px;
+        }
+          
+        .audio-init-button:hover:not(:disabled) {
           background: #3a78ff;
           transform: scale(1.05);
         }
@@ -471,6 +505,11 @@ const ParkScene = () => {
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+          0% { opacity: 0; transform: scale(0.95); }
+          100% { opacity: 1; transform: scale(1); }
         }
       `}</style>
     </div>

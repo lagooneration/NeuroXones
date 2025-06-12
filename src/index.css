@@ -609,29 +609,3 @@ body {
   opacity: 1;
 }
 
-/* Construction border style for audio trackpad */
-.construction-border {
-  position: relative;
-  border-radius: 12px;
-  padding: 10px;
-  background-image: repeating-linear-gradient(
-    45deg,
-    #ffd700,
-    #ffd700 12px,
-    #000000 12px,
-    #000000 24px
-  );
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-  overflow: hidden;
-}
-
-/* Add a slight glow effect to the construction border */
-.construction-border::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  box-shadow: inset 0 0 15px rgba(255, 215, 0, 0.7);
-  pointer-events: none;
-  z-index: 1;
-}

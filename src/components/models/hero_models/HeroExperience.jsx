@@ -1,7 +1,6 @@
 import { OrbitControls, useProgress } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useMediaQuery } from "react-responsive";
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { Suspense, useEffect, useCallback } from "react";
 import { Grid } from 'ldrs/react';
 import 'ldrs/react/Grid.css';
@@ -36,22 +35,22 @@ const Scene = () => {
   const { progress } = useProgress();
 
   const [brainSpring, setBrainSpring] = useSpring(() => ({
-    position: [0, 20, 0],
+    position: [20, 0, 0],
     config: { mass: 1, tension: 280, friction: 60 }
   }));
 
   const [hpSpring, setHpSpring] = useSpring(() => ({
-    position: [0, 20, 0],
+    position: [-4, 20, 0],
     config: { mass: 1, tension: 280, friction: 60 }
   }));
   const animateModels = useCallback(() => {
     setBrainSpring.start({
       position: isSmallMobile ? [0, -2.0, 0] : isMobile ? [0, -1.8, 0] : [0, -1.2, 0],
-      delay: 300
+      delay: 1100
     });
     setHpSpring.start({
       position: isSmallMobile ? [0, -4.5, 0] : isMobile ? [0, -4.2, 0] : [0, -3.2, 0],
-      delay: 500
+      delay: 1300
     });
   }, [setBrainSpring, setHpSpring, isMobile, isSmallMobile]);
 
@@ -62,7 +61,7 @@ const Scene = () => {
   }, [progress, animateModels]);
 
   return (
-    <>      <ambientLight intensity={0.2} />
+    <>      
       <OrbitControls
         enablePan={false}
         enableZoom={false}
@@ -80,7 +79,7 @@ const Scene = () => {
       
       {/* Brain model group */}
       <animated.group
-        scale={isSmallMobile ? [21, 21, 21] : isMobile ? [21, 21, 21] : [15, 15, 15]}
+        scale={isSmallMobile ? [21, 21, 21] : isMobile ? [23, 23, 23] : [15, 15, 15]}
         position={brainSpring.position}
         rotation={[0, -Math.PI * 1.85, 0]}
       >
@@ -89,16 +88,12 @@ const Scene = () => {
 
       {/* HP model group */}
       <animated.group
-        scale={isSmallMobile ? [27, 27, 27] : isMobile ? [27, 27, 27] : [20, 20, 20]}
+        scale={isSmallMobile ? [27, 27, 27] : isMobile ? [29, 29, 29] : [20, 20, 20]}
         position={hpSpring.position}
         rotation={[0, -Math.PI * 1.85, 0]}
       >
         <Hp />
       </animated.group>
-
-      <EffectComposer>
-        <Bloom luminanceThreshold={.9} luminanceSmoothing={0.9} height={500} />
-      </EffectComposer>
     </>
   );
 };
