@@ -82,7 +82,7 @@ const AudioExperience = () => {
 
   return (
     <ErrorBoundary>
-      <section className="h-screen overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800">
+      <section className="h-screen overflow-hidden bg-gradient-to-b from-gray-900 to-gray-800">        
         <div className="absolute top-16 left-4 z-10">
           <Link
             to="/"
@@ -95,18 +95,17 @@ const AudioExperience = () => {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              className="flex-shrink-0"
             >
               <path d="M15 10H5M5 10L10 15M5 10L10 5" />
             </svg>
-            Home
+            <span className="hidden sm:inline">Home</span>
           </Link>
         </div>
         <div className="absolute top-12 left-1/2 -translate-x-1/2 text-center z-10">
           <TitleHeader />
-        </div>
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-sm text-gray-400 z-10">
-          Click anywhere and move cursor to focus on sound of interest
-        </div>        <div
+        </div>       
+        <div
           className="h-full"
           role="main"
           aria-label="3D Audio Experience"

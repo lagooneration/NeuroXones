@@ -6,13 +6,34 @@ Source: https://sketchfab.com/3d-models/lowpoly-bird-robin-e8083fd21a73438ca67b9
 Title: Lowpoly bird (Robin)
 */
 
-import React, { useRef } from 'react'
+import React, { useRef, useEffect } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
+import PropTypes from 'prop-types'
 
 export function Bird(props) {
   const group = useRef()
   const { nodes, materials, animations } = useGLTF('/models/bird.glb')
   const { actions } = useAnimations(animations, group)
+  
+  // Play animation when the bird is active
+  React.useEffect(() => {
+    // Play animation when the component is active
+    if (props.isActive) {
+      // Get the first animation or a specific animation if you know its name
+      const animationName = Object.keys(actions)[0]
+      if (actions[animationName]) {
+        actions[animationName].reset().fadeIn(0.5).play()
+      }
+    } else {
+      // Stop all animations when not active
+      Object.values(actions).forEach(action => {
+        if (action && action.isRunning && action.isRunning()) {
+          action.fadeOut(0.5)
+        }
+      })
+    }
+  }, [props.isActive, actions])
+  
   return (
     <group ref={group} {...props} dispose={null}>
       <group name="Sketchfab_Scene">
@@ -101,6 +122,10 @@ export function Bird(props) {
       </group>
     </group>
   )
+}
+
+Bird.propTypes = {
+  isActive: PropTypes.bool
 }
 
 useGLTF.preload('/models/bird.glb')

@@ -2,8 +2,6 @@ import React, { useState, useRef, useEffect, useCallback, Suspense } from 'react
 import { Canvas, useThree } from '@react-three/fiber';
 import { 
   Environment, 
-  OrbitControls,
-  Sky,
   useProgress,
   Html,
   useGLTF
@@ -20,14 +18,15 @@ import { Bird } from './models/sim_models/Bird';
 const ICONS = {
   cat: '/icons/cat.svg',
   bird: '/icons/bird.svg',
-  player: '/icons/play.svg'
+  player: '/icons/player.svg'
 };
 
 // Audio files
 const AUDIO_FILES = {
   cat: '/audio/cat.mp3',
-  bird: '/audio/birds.mp3',
-  player: '/audio/player.mp3'
+  bird: '/audio/bird.mp3',
+  player: '/audio/player.mp3',
+  traffic: '/audio/traffic.mp3'
 };
 
 // Loading indicator component
@@ -116,38 +115,32 @@ function Scene({ activeModel }) {
       {/* Add lighting for better visibility */}
       <ambientLight intensity={0.5} />
       <directionalLight position={[10, 10, 5]} intensity={1} />
-      
-      {/* The 3D models */}
+        {/* The 3D models */}
       <group>
         {/* Position the models in a semi-circle */}
         <Player 
-          position={[7.6, -3, -12]}
+          position={[7, -4, -18]}
           rotation={[0, -Math.PI / 4, 0]} 
           scale={10} 
           visible={true}
+          isActive={activeModel === 'player'}
         />
         <Cat 
-          position={[-4, -0.8, -4]} 
+          position={[-2, -0.8, -8]} 
           rotation={[0, -Math.PI / 12, 0]} 
           scale={0.08} 
           visible={true}
+          isActive={activeModel === 'cat'}
         />
         <Bird 
-          position={[1.5, 0, 4.2]} 
+          position={[0.7, 0, 4.2]} 
           rotation={[0, -Math.PI / 6, 0]} 
           scale={4} 
           visible={true}
+          isActive={activeModel === 'bird'}
         />
       </group>
       
-      {/* Controls for the camera */}
-      <OrbitControls 
-        enableZoom={true} 
-        enablePan={true} 
-        enableRotate={true} 
-        minDistance={2} 
-        maxDistance={15}
-      />
     </>
   );
 }
@@ -193,7 +186,8 @@ function AudioController({ activeModel, initializedByUser }) {
   const audioRefs = useRef({
     cat: new Audio(AUDIO_FILES.cat),
     bird: new Audio(AUDIO_FILES.bird),
-    player: new Audio(AUDIO_FILES.player)
+    player: new Audio(AUDIO_FILES.player),
+    traffic: new Audio(AUDIO_FILES.traffic)
   });
 
   // Initialize audio settings but don't play yet
@@ -208,6 +202,9 @@ function AudioController({ activeModel, initializedByUser }) {
       audio.volume = 0.1; // Default low volume
     });
     
+    // Set traffic volume to 30%
+    audios.traffic.volume = 0.2;
+    
     // Cleanup function
     return () => {
       Object.values(audios).forEach(audio => {
@@ -216,12 +213,15 @@ function AudioController({ activeModel, initializedByUser }) {
       });
     };
   }, []);
-    // Function to start audio playback (will be called after user interaction)
+  // Function to start audio playback (will be called after user interaction)
   const initializeAudio = useCallback(() => {
     if (audioInitialized) return;
     
     const audios = audioRefs.current;
-    // Start playing all audio files at low volume
+    // Ensure traffic sound is at 30% volume
+    audios.traffic.volume = 0.2;
+    
+    // Start playing all audio files
     const playPromises = Object.values(audios).map(audio => 
       audio.play().catch(e => console.log("Audio playback error:", e))
     );
@@ -235,8 +235,7 @@ function AudioController({ activeModel, initializedByUser }) {
     if (initializedByUser && !audioInitialized) {
       initializeAudio();
     }
-  }, [initializedByUser, audioInitialized, initializeAudio]);
-  useEffect(() => {
+  }, [initializedByUser, audioInitialized, initializeAudio]);  useEffect(() => {
     if (!audioInitialized) return;
     
     // Store a reference to audioRefs.current to use in effect and cleanup
@@ -245,6 +244,9 @@ function AudioController({ activeModel, initializedByUser }) {
     
     // Enhance the volume of the hovered model's audio
     Object.keys(audios).forEach(model => {
+      // Skip traffic sound as it should maintain constant volume
+      if (model === 'traffic') return;
+      
       if (activeModel === model) {
         // Gradually increase volume
         const fadeIn = setInterval(() => {
@@ -279,7 +281,8 @@ function AudioController({ activeModel, initializedByUser }) {
       {!audioInitialized && (
         <div className="audio-init-overlay" onClick={initializeAudio}>
           <button className="audio-init-button">
-            Click to Enable Audio
+            Start 
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fillRule="evenodd" clipRule="evenodd" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM10.6935 15.8458L15.4137 13.059C16.1954 12.5974 16.1954 11.4026 15.4137 10.941L10.6935 8.15419C9.93371 7.70561 9 8.28947 9 9.21316V14.7868C9 15.7105 9.93371 16.2944 10.6935 15.8458Z" fill="#1C274C"></path> </g></svg>
           </button>
         </div>
       )}
@@ -316,8 +319,8 @@ const ParkScene = () => {
       className="park-scene-container" 
       onClick={handleUserInteraction}
     >
-      <h2>Selective Listening Experience</h2>
-      <p>Hover over an icon below to enhance its audio - simulating selective listening</p>      <div className="canvas-container">
+      <h2>Active Listening</h2>
+      <p>Hover over an icon below to enhance - simulating selective listening</p>      <div className="canvas-container">
         <Canvas
           gl={{ 
             antialias: true,
@@ -325,9 +328,10 @@ const ParkScene = () => {
             alpha: true,
             powerPreference: 'high-performance'
           }}
-          camera={{ position: [2, 2, 10], fov: 45 }}
+          camera={{ position: [2, 2, 10], fov: 55 }}
           dpr={[1, 2]}
-          style={{ background: 'transparent' }}          shadows
+          style={{ background: 'transparent' }}          
+          shadows
           onCreated={({ gl }) => {
             gl.setClearColor(new THREE.Color('#87CEEB'), 0);
             // Only add event listener if canvas is available
