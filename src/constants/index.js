@@ -116,8 +116,7 @@ export const experiences = [
     job: "Capture it!",
     date: "Don't just remove noise",
     contents: [
-      "Investigating the feasibility & performance of a predictive learning framework for real-time cancellation of physiological artifacts in EEG signals.",
-      "Finding ways to capture clean EEG signals to train mapping of temporal response machine learning model.",
+      "Investigating the feasibility & performance to capture clean EEG signals using physiological artifacts prediction learning framework for real-time EEG noise cancellation.",
       "imagePath: /assets/hp.png",
     ],
   },

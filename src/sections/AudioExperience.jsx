@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import ParkAudioScene from '../components/ParkAudioScene';
 import TitleHeader from '../components/TitleHeader';
+import ParkScene from '../components/ParkScene';
 
 const ErrorBoundary = ({ children }) => {
   const [hasError, setHasError] = useState(false);
@@ -106,13 +106,12 @@ const AudioExperience = () => {
         </div>
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-sm text-gray-400 z-10">
           Click anywhere and move cursor to focus on sound of interest
-        </div>
-        <div
+        </div>        <div
           className="h-full"
           role="main"
           aria-label="3D Audio Experience"
         >
-          <ParkAudioScene />
+          <ParkScene />
         </div>
       </section>
     </ErrorBoundary>
