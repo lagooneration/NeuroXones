@@ -18,6 +18,7 @@ const About = () => {  const grid2Container = useRef();
             src="assets/images/hp.png"
             className="absolute scale-[1.75] -right-[5rem] -top-[1rem] md:scale-[3] md:left-50 md:inset-y-10 lg:scale-[2.5]"
             alt="Headphone visualization"
+            title="Headphone"
           />
           <div className="z-10">
             <p className="headtext">Headphone Integration</p>
@@ -26,7 +27,8 @@ const About = () => {  const grid2Container = useRef();
               </p>
           </div>
           <div className="absolute inset-x-0 pointer-evets-none -bottom-4 h-1/2 sm:h-1/3 bg-gradient-to-t from-indigo" />
-        </div>        {/* Grid 2 */}
+        </div>        
+        {/* Grid 2 */}
         <div className="grid-black-color grid-3 relative overflow-hidden"> 
           <div
             ref={grid3Container}
@@ -36,6 +38,7 @@ const About = () => {  const grid2Container = useRef();
               src="assets/images/ac.png"
               className="absolute inset-0 w-full h-full object-cover opacity-60"
               alt="Auditory cortex visualization"
+              title="Auditory Cortex"
             />
             {/* Main area for MagnetLines (taking up most of the space) */}
               <MagnetLines
@@ -69,6 +72,7 @@ const About = () => {  const grid2Container = useRef();
             src="assets/images/vr.png"
             className="absolute z-0"
             alt="VR headset visualization"
+            title="VR headset"
           />
           <div className="z-10">
             <p className="absolute bg-black/60 text-center -bottom-2 w-full left-0 headtext">AR/VR Integration</p>
@@ -95,6 +99,7 @@ const About = () => {  const grid2Container = useRef();
             src="assets/images/ci.png"
             className="absolute z-0 -top-[40px] md:-top-[170px]"
             alt="Cochlear Implant visualization"
+            title="CI headset"
           />
           <div className="z-10">
             <p className="absolute bg-black/60 text-center -bottom-2 w-full left-0 headtext">Cochlear Implant Integration</p>

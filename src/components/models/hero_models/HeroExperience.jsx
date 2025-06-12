@@ -2,7 +2,7 @@ import { OrbitControls, useProgress } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useMediaQuery } from "react-responsive";
 import { Suspense, useEffect, useCallback } from "react";
-import { Grid } from 'ldrs/react';
+import { Helix } from 'ldrs/react';
 import 'ldrs/react/Grid.css';
 import { Brain } from "../../models/Brain";
 import { Hp } from "../Hp";
@@ -20,7 +20,7 @@ function Loader() {
       transform: 'translate(-50%, -50%)',
       zIndex: 1000
     }}>
-      <Grid
+      <Helix
         size={60}
         speed={1.5}
         color="white"
@@ -46,11 +46,11 @@ const Scene = () => {
   const animateModels = useCallback(() => {
     setBrainSpring.start({
       position: isSmallMobile ? [0, -2.0, 0] : isMobile ? [0, -1.8, 0] : [0, -1.2, 0],
-      delay: 1100
+      delay: 900
     });
     setHpSpring.start({
       position: isSmallMobile ? [0, -4.5, 0] : isMobile ? [0, -4.2, 0] : [0, -3.2, 0],
-      delay: 1300
+      delay: 1150
     });
   }, [setBrainSpring, setHpSpring, isMobile, isSmallMobile]);
 

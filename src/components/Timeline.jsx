@@ -62,8 +62,9 @@ export const Timeline = ({ data }) => {
         <div className="w-full overflow-hidden rounded-lg mb-6">
           <img 
             src={imagePath}
-            alt="Project illustration"
+            alt="Timeline"
             className="w-full h-auto object-contain"
+            title="RnD"
           />
         </div>
       );
